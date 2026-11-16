@@ -1,0 +1,14 @@
+# Line endings.
+# The website runs on Windows locally but the API runs on Linux at Vercel, and
+# a stray CRLF can break a small text file such as .python-version. Storing
+# every text file with LF keeps both environments happy.
+* text=auto eol=lf
+
+# Real binary files must not be touched.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary

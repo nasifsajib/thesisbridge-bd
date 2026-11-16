@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ThesisBridge BD — Visual Docs 2 (24/24 · Docs + Website)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1c2a24;--muted:#5a6f66;--line:#dfe8e2;--paper:#eef3f0;--card:#fff;--green:#0b6e4f;--green-soft:#e3f2ec;--dark:#10231c;--blue:#1a56db;--blue-soft:#e3ecfd;--amber:#9a6a00;--amber-soft:#fff6dd;--sans:'Inter',system-ui,sans-serif;--head:'Sora',sans-serif;--mono:'JetBrains Mono',Consolas,monospace;--bengali:'Hind Siliguri',sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--sans);color:var(--ink);background:var(--paper);line-height:1.7;font-size:15px}
+header.top{background:linear-gradient(130deg,#0b6e4f,#0e8a63 60%,#12a071);color:#fff;padding:40px 22px 30px}
+.wrap{max-width:1360px;margin:0 auto;padding:0 22px 60px}header.top .wrap{padding-bottom:0}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.22em;opacity:.85}
+header.top h1{font-family:var(--head);font-size:clamp(22px,4vw,34px);margin:10px 0 6px}
+.byline{font-size:14px;opacity:.9}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.lang-switch{display:inline-flex;gap:6px;background:rgba(255,255,255,.16);padding:5px;border-radius:12px}
+.lang-switch button{border:0;background:transparent;color:#fff;font:600 14px var(--sans);padding:7px 16px;border-radius:8px;cursor:pointer}
+.lang-switch button.active{background:#fff;color:var(--green)}
+.hint{font-size:13px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);padding:8px 14px;border-radius:10px}
+.legend{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:22px 0 6px;display:flex;gap:8px;flex-wrap:wrap;font-size:13px}
+.legend span{border-radius:8px;padding:4px 12px;font-weight:600}
+.lg-doc{background:var(--green-soft);color:var(--green)}.lg-pv{background:var(--blue-soft);color:var(--blue)}.lg-try{background:var(--amber-soft);color:var(--amber)}.lg-code{background:var(--dark);color:#b8f0d8;font-family:var(--mono)}
+nav.toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin:14px 0 10px}
+nav.toc h2{font-family:var(--head);font-size:16px;margin:0 0 10px}
+nav.toc ol{margin:0;padding-left:22px;columns:3;column-gap:28px}
+nav.toc li{margin:4px 0;break-inside:avoid;font-size:13px}
+nav.toc a{color:var(--green);text-decoration:none;font-weight:500}
+nav.toc .pvtag{font-family:var(--mono);font-size:10.5px;color:var(--blue);display:block}
+.doc-sec{background:var(--card);border:1px solid var(--line);border-radius:16px;margin:20px 0;overflow:hidden;scroll-margin-top:12px}
+.sec-head{padding:18px 24px 12px;border-bottom:1px dashed var(--line);display:flex;gap:12px;align-items:flex-start}
+.sec-num{flex:0 0 auto;min-width:42px;height:42px;padding:0 8px;border-radius:12px;background:var(--green);color:#fff;font:800 17px var(--head);display:flex;align-items:center;justify-content:center}
+.sec-head h2{font-family:var(--head);font-size:18px;margin:0;line-height:1.4}
+.sec-head h2 .bn-h{display:block;font-size:15px;color:var(--green);font-family:var(--bengali);font-weight:600}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{font-family:var(--mono);font-size:11px;border-radius:999px;padding:3px 11px;font-weight:600}
+.chip.page{background:var(--blue-soft);color:var(--blue)}.chip.anchor{background:#ede9fe;color:#5b21b6}.chip.code{background:var(--dark);color:#b8f0d8}
+.split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr)}
+.doc-text{padding:16px 24px 22px;border-right:1px solid var(--line)}
+.doc-text p{margin:8px 0}
+div[lang="bn"] p,div[lang="bn"] li{font-family:var(--bengali);font-size:15.5px}
+body[data-lang="en"] [lang="bn"],body[data-lang="bn"] [lang="en"]{display:none}
+.bn-tag{display:inline-block;font-family:var(--bengali);font-size:11px;font-weight:700;color:var(--green);background:var(--green-soft);border-radius:6px;padding:1px 8px;margin:8px 0 2px}
+body[data-lang="bn"] .bn-tag{display:none}
+ul.tight,ol.tight{margin:6px 0 10px;padding-left:22px}ul.tight li,ol.tight li{margin:4px 0}
+ol.mark{margin:8px 0;padding:0;list-style:none;counter-reset:m}
+ol.mark li{counter-increment:m;position:relative;padding:6px 6px 6px 40px;margin:6px 0;background:#f6faf8;border:1px solid var(--line);border-radius:10px;font-size:13.5px}
+ol.mark li::before{content:counter(m);position:absolute;left:8px;top:6px;width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font:700 13px var(--sans);display:flex;align-items:center;justify-content:center}
+pre.code{background:#10231c;color:#d9efe5;border-radius:12px;padding:12px 14px;overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.6;margin:10px 0 6px;white-space:pre}
+code.inline{font-family:var(--mono);font-size:12px;background:var(--green-soft);color:var(--green);border-radius:5px;padding:1px 6px}
+.cap{font-family:var(--mono);font-size:11px;color:var(--muted);margin:0 0 8px}.cap b{color:var(--green)}
+.viva{border-left:3px solid var(--green);background:var(--green-soft);border-radius:0 10px 10px 0;padding:8px 12px;margin:10px 0;font-size:13.5px}
+.try{background:var(--amber-soft);border:1px solid #ecd9b0;border-radius:10px;padding:8px 12px;font-size:13px;margin-top:10px}
+.try ol{margin:6px 0 2px;padding-left:20px}.pill{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;background:var(--green-soft);color:var(--green);border-radius:999px;padding:2px 10px;margin:0 4px 6px 0}
+.preview{background:#f2f6ff;padding:16px;display:flex;flex-direction:column;gap:10px;border-left:4px solid var(--blue)}
+.pv-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pv-id{font:800 12px var(--mono);background:var(--blue);color:#fff;border-radius:8px;padding:4px 10px;white-space:nowrap}
+.pv-id.code{background:var(--dark);color:#b8f0d8}
+.pv-label{font-family:var(--head);font-size:13px;font-weight:700;color:var(--blue)}
+.pv-label small{display:block;font-family:var(--mono);font-weight:400;color:var(--muted);font-size:11px}
+.pv-actions{display:flex;gap:6px;flex-wrap:wrap;width:100%}
+.pv-actions button,.pv-actions a{font:600 12px var(--sans);border:1px solid #c9d8f5;background:#fff;color:var(--blue);border-radius:8px;padding:6px 10px;cursor:pointer;text-decoration:none}
+.pv-actions button.active,.pv-actions button.goto.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.frame-wrap{background:#fff;border:1px solid #c9d8f5;border-radius:12px;overflow:hidden;display:flex;justify-content:center}
+.frame-wrap iframe{width:100%;height:500px;border:0;background:#fff}
+.frame-wrap.mobile iframe{width:390px;max-width:100%;border-left:2px dashed var(--blue);border-right:2px dashed var(--blue)}
+.pv-look{background:#fff;border:1px solid #c9d8f5;border-radius:10px;padding:10px 14px;font-size:13px}
+.pv-look h4{margin:0 0 6px;font-size:13px;color:var(--blue);font-family:var(--head)}
+.pv-look ol{margin:0;padding-left:20px}.pv-look code{font-family:var(--mono);font-size:11px;background:var(--blue-soft);color:var(--blue);border-radius:4px;padding:0 5px}
+.codefocus{background:#0f211b;color:#d9efe5;border-radius:12px;padding:14px 16px;font-family:var(--mono);font-size:12px;line-height:1.65;overflow-x:auto;white-space:pre}
+.codefocus .cm{color:#7fb89f}.codefocus .kw{color:#7dd3a8;font-weight:700}
+table.map{width:100%;border-collapse:collapse;font-size:12.5px;margin:10px 0}
+table.map th,table.map td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+table.map th{background:var(--green-soft);color:var(--green);font-size:11.5px}
+table.map td code{font-family:var(--mono);font-size:11px;color:var(--green)}
+footer.doc{text-align:center;color:var(--muted);font-size:13px;padding:14px 22px 40px}
+@media(max-width:1020px){.split{grid-template-columns:1fr}.doc-text{border-right:0;border-bottom:1px solid var(--line)}.preview{border-left:0;border-top:4px solid var(--blue)}nav.toc ol{columns:2}.frame-wrap iframe{height:460px}}
+@media(max-width:640px){nav.toc ol{columns:1}.frame-wrap iframe{height:430px}}
+</style>
+</head>
+<body data-lang="both">
+<!-- Backend update notice: the walkthrough below was written for the original
+     frontend-only prototype. The project now has a Python backend. -->
+<div style="background:#0b6e4f;color:#fff;padding:12px 22px;font:600 13.5px/1.6 Inter,system-ui,sans-serif">
+  <strong>Update · November 2026:</strong> a <strong>Python (FastAPI)</strong> backend and a
+  <strong>Supabase PostgreSQL</strong> database were added. Login/sign-up, bookmarks, roadmap,
+  checklist, saved supervisors and connection requests now use the API and database.
+  Current setup: <code style="background:#fff;color:#0b6e4f;padding:1px 6px;border-radius:4px">SETUP.md</code> ·
+  backend log: <code style="background:#fff;color:#0b6e4f;padding:1px 6px;border-radius:4px">WORK_HISTORY.md</code>.
+</div>
+<header class="top"><div class="wrap">
+<span class="kicker">VISUAL DOCS · 24/24 · DOCS (LEFT) + WEBSITE (RIGHT) · docs.html §1–§24</span>
+<h1>ThesisBridge BD — ২৪টা অংশ, পাশাপাশি</h1>
+<p class="sub">বামে <b>সবুজ = ব্যাখ্যা + কোড</b> · ডানে <b>নীল = live preview</b> · <b>কালো = code-focus</b> (যেখানে UI নেই)। docs.html-এর §1–§24 সব কভার।</p>
+<p class="byline">Prepared by <strong>Nasif Shahrear</strong> — CSE22 · ID 2 · <strong>docs2.html</strong></p>
+<div class="controls"><div class="lang-switch"><button data-mode="both" class="active">Both</button><button data-mode="en">English</button><button data-mode="bn">বাংলা</button></div>
+<span class="hint">💡 Preview live — scroll/click/type করো। না চললে Full page ↗। Mobile = 390px ফোন-ভিউ।</span></div>
+</div></header>
+<div class="wrap">
+<div class="legend"><span class="lg-doc">📖 বাম = ব্যাখ্যা</span><span class="lg-pv">🔵 ডান = live preview PV-01…</span><span class="lg-code">&lt;/&gt; কালো = code-focus (UI নেই)</span><span class="lg-try">🧪 হলুদ = Try steps</span></div>
+<nav class="toc"><h2>Contents · 24 Sections (docs.html § → docs2 D)</h2><ol>
+<li><a href="#d1">D1 §1 Overview</a><span class="pvtag">PV-01 → about.html</span></li>
+<li><a href="#d2">D2 §2 Technologies</a><span class="pvtag">PV-02 → index.html (view-source focus)</span></li>
+<li><a href="#d3">D3 §3 File structure</a><span class="pvtag">PV-03 → code-focus tree</span></li>
+<li><a href="#d4">D4 §4 How app works</a><span class="pvtag">PV-04 → research.html (mount)</span></li>
+<li><a href="#d5">D5 §5 Navbar + drawer</a><span class="pvtag">PV-05 → index.html top</span></li>
+<li><a href="#d6">D6 §6 Hero + Network</a><span class="pvtag">PV-06 → index.html#hero</span></li>
+<li><a href="#d7">D7 §7 Stats</a><span class="pvtag">PV-07 → index.html#stats</span></li>
+<li><a href="#d8">D8 §8 Explorer</a><span class="pvtag">PV-08 → research.html controls</span></li>
+<li><a href="#d9">D9 §9 Details + bookmark</a><span class="pvtag">PV-09 → index.html#research-explorer</span></li>
+<li><a href="#d10">D10 §10 Supervisor + quiz</a><span class="pvtag">PV-10 → supervisors.html</span></li>
+<li><a href="#d11">D11 §11 Roadmap</a><span class="pvtag">PV-11 → index.html#roadmap</span></li>
+<li><a href="#d12">D12 §12 Pub + checklist</a><span class="pvtag">PV-12 → publication.html (tabs)</span></li>
+<li><a href="#d13">D13 §13 Resources</a><span class="pvtag">PV-13 → resources.html</span></li>
+<li><a href="#d14">D14 §14 FAQ</a><span class="pvtag">PV-14 → about.html#faq</span></li>
+<li><a href="#d15">D15 §15 Auth</a><span class="pvtag">PV-15 → index.html (Login modal)</span></li>
+<li><a href="#d16">D16 §16 Dark mode</a><span class="pvtag">PV-16 → index.html (🌙 focus)</span></li>
+<li><a href="#d17">D17 §17 Toast + modal</a><span class="pvtag">PV-17 → research.html (toast trigger)</span></li>
+<li><a href="#d18">D18 §18 Responsive</a><span class="pvtag">PV-18 → index.html (mobile 390)</span></li>
+<li><a href="#d19">D19 §19 Data arch</a><span class="pvtag">PV-19 → code-focus data.js</span></li>
+<li><a href="#d20">D20 §20 How to run</a><span class="pvtag">PV-20 → code-focus terminal</span></li>
+<li><a href="#d21">D21 §21 Limits + future</a><span class="pvtag">PV-21 → about.html mission</span></li>
+<li><a href="#d22">D22 §22 Viva Q&A</a><span class="pvtag">PV-22 → QA panel (code-focus)</span></li>
+<li><a href="#d23">D23 §23 Walkthrough A–J</a><span class="pvtag">PV-23 → code-focus A–J</span></li>
+<li><a href="#d24">D24 §24 Drill tables</a><span class="pvtag">PV-24 → practice map</span></li>
+</ol></nav>
+
+<!-- D1 §1 -->
+<section class="doc-sec" id="d1"><div class="sec-head"><div class="sec-num">1</div><div><h2><span lang="en">D1 · §1 What is ThesisBridge BD?</span><span class="bn-h" lang="bn">১. ThesisBridge BD কী?</span></h2><div class="chips"><span class="chip page">📄 about.html</span><span class="chip anchor">📍 mission + journey</span><span class="chip code">⚙️ 20 ideas · 12 sup · 20 res · 7 guides · 8 steps · 8 FAQ</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>Frontend-only <b>digital hub</b>: idea → supervisor → roadmap → publication in one site. Sample data in JS, user data in <code class="inline">localStorage</code>.</p><div><span class="pill">20 ideas</span><span class="pill">12 supervisors</span><span class="pill">20 resources</span><span class="pill">7 guides</span><span class="pill">8 steps</span><span class="pill">8 FAQs</span><span class="pill">6 pages</span></div></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>থিসিসের পুরো যাত্রা এক সাইটে। স্যাম্পল ডেটা JS-এ, ইউজার ডেটা ব্রাউজারে।</p></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-01</span><div class="pv-label">about.html<small>mission + four tools</small></div><div class="pv-actions"><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button><a href="about.html" target="_blank">Full ↗</a></div></div><div class="frame-wrap"><iframe src="about.html" loading="lazy" title="PV-01"></iframe></div><div class="pv-look"><h4>👀 PV-01</h4><ol><li>① “Four tools, one journey” কার্ড।</li><li>② Mission + CTA band।</li><li>③ Counts গুনো।</li></ol></div></div></div></section>
+
+<!-- D2 §2 -->
+<section class="doc-sec" id="d2"><div class="sec-head"><div class="sec-num">2</div><div><h2><span lang="en">D2 · §2 Technologies (no framework)</span><span class="bn-h" lang="bn">২. টেকনোলজি</span></h2><div class="chips"><span class="chip page">📄 index.html</span><span class="chip anchor">📍 &lt;head&gt; + view-source focus</span><span class="chip code">⚙️ HTML5 · CSS3 · vanilla JS · FA · localStorage</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>HTML5 structure · CSS3 Grid/Flex + variables · <b>vanilla JS, no React/Vue/jQuery</b> · Font Awesome · Google Fonts · <code class="inline">localStorage</code>. Why vanilla? Every line explainable in viva.</p></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>ফ্রেমওয়ার্ক নেই — প্রতিটা লজিক হাতে লেখা, ভাইভায় ব্যাখ্যা سهজ।</p><div class="try">🧪 <b>Try:</b><ol><li>Preview → F12 → Sources: শুধু <code>css/ js/ assets/</code>, কোনো React নেই।</li></ol></div></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-02</span><div class="pv-label">index.html — tech proof<small>F12 view-source: no framework</small></div><div class="pv-actions"><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button><a href="index.html" target="_blank">Full ↗</a></div></div><div class="frame-wrap"><iframe src="index.html" loading="lazy" title="PV-02"></iframe></div><div class="pv-look"><h4>👀 PV-02</h4><ol><li>① Animations smooth = CSS, not lib।</li><li>② Icons = Font Awesome।</li><li>③ Dark toggle = CSS variables (D16)।</li></ol></div></div></div></section>
+
+<!-- D3 §3 -->
+<section class="doc-sec" id="d3"><div class="sec-head"><div class="sec-num">3</div><div><h2><span lang="en">D3 · §3 File structure</span><span class="bn-h" lang="bn">৩. ফাইল স্ট্রাকচার</span></h2><div class="chips"><span class="chip page">📄 all files</span><span class="chip anchor">📍 code-focus (no UI)</span><span class="chip code">⚙️ separation of concerns</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>HTML = where · CSS = look · <code class="inline">data.js</code> = content · one JS per feature. Replace any one file safely.</p></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>দায়িত্ব আলাদা ফাইলে — একটা বদলালে বাকি ভাঙে না।</p></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id code">&lt;/&gt; PV-03</span><div class="pv-label">File tree (code-focus)<small>explorer-এ মিলিয়ে দেখো</small></div></div><div class="codefocus">thesisbridge-bd/
+├── index.html <span class="cm">→ home: hero stats explorer roadmap FAQ</span>
+├── research.html <span class="cm">→ full explorer</span>
+├── supervisors.html <span class="cm">→ directory + quiz</span>
+├── publication.html <span class="cm">→ guides + checklist</span>
+├── resources.html <span class="cm">→ library</span>
+├── about.html <span class="cm">→ mission + FAQ</span>
+├── css/style.css <span class="cm">→ theme+components</span>
+├── css/responsive.css <span class="cm">→ breakpoints</span>
+└── js/ <span class="kw">data main network research
+        supervisors publication resources</span></div><div class="pv-look"><h4>👀 PV-03</h4><ol><li>① <code>data.js</code> = content door।</li><li>② <code>main.js</code> = user-data door।</li><li>③ বাকি JS = একটা করে ফিচার।</li></ol></div></div></div></section>
+
+<!-- D4 §4 -->
+<section class="doc-sec" id="d4"><div class="sec-head"><div class="sec-num">4</div><div><h2><span lang="en">D4 · §4 How the app works (mount flow)</span><span class="bn-h" lang="bn">৪. কাজের ধারা</span></h2><div class="chips"><span class="chip page">📄 research.html</span><span class="chip anchor">📍 data-mount="research"</span><span class="chip code">⚙️ HTML where · JS what · state saved</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>Open HTML → CSS paints → JS finds <code class="inline">data-mount</code> and renders from <code class="inline">data.js</code> → clicks update page + <code class="inline">localStorage</code> → next visit restores.</p><pre class="code">&lt;div data-mount="research"&gt;&lt;/div&gt;
+querySelectorAll('[data-mount="research"]')
+  .forEach(renderExplorer);</pre></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>HTML জায়গা ঠিক করে, JS ডেটা বসায়, localStorage মনে রাখে।</p></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-04</span><div class="pv-label">research.html<small>empty div → cards appear = mount</small></div><div class="pv-actions"><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button><a href="research.html" target="_blank">Full ↗</a></div></div><div class="frame-wrap"><iframe src="research.html" loading="lazy" title="PV-04"></iframe></div><div class="pv-look"><h4>👀 PV-04</h4><ol><li>① Reload → cards “বসে” = JS render।</li><li>② F12 → <code>data-mount</code> খোঁজো।</li><li>③ Filter → refresh-এও থাকে = state।</li></ol></div></div></div></section>
+
+<!-- D5 §5 -->
+<section class="doc-sec" id="d5"><div class="sec-head"><div class="sec-num">5</div><div><h2><span lang="en">D5 · §5 Sticky navbar + drawer + bug fix</span><span class="bn-h" lang="bn">৫. নেভবার + বাগ ফিক্স</span></h2><div class="chips"><span class="chip page">📄 index.html</span><span class="chip anchor">📍 #navbar top 72px</span><span class="chip code">⚙️ main.js initNav() · ::before blur</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>Sticky, 6 links; &lt;1080px → drawer. <b>Bug:</b> <code class="inline">backdrop-filter</code> on navbar trapped fixed drawer → blur moved to <code class="inline">::before</code>.</p><pre class="code">.navbar::before{content:'';position:absolute;
+ inset:0;backdrop-filter:blur(14px);}</pre></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>মোবাইলে ☰ → ড্রয়ার। blur-এর বাগ ::before-এ ঠিক।</p><div class="try">🧪 <b>Try:</b><ol><li>Mobile → ☰ → drawer।</li><li>Scrim-এ ক্লিক → বন্ধ।</li></ol></div></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-05</span><div class="pv-label">index.html — top only<small>শুধু navbar দেখো</small></div><div class="pv-actions"><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button><a href="index.html" target="_blank">Full ↗</a></div></div><div class="frame-wrap"><iframe src="index.html" loading="lazy" title="PV-05"></iframe></div><div class="pv-look"><h4>👀 PV-05</h4><ol><li>① 6 links।</li><li>② 🌙 🔖 ☰ Login।</li><li>③ Mobile-এ ☰ আসে।</li></ol></div></div></div></section>
+
+<!-- D6 §6 -->
+<section class="doc-sec" id="d6"><div class="sec-head"><div class="sec-num">6</div><div><h2><span lang="en">D6 · §6 Hero + Research Network FIG.01</span><span class="bn-h" lang="bn">৬. হিরো + নেটওয়ার্ক</span></h2><div class="chips"><span class="chip page">📄 index.html</span><span class="chip anchor">📍 #hero</span><span class="chip code">⚙️ network.js physics() render()</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>SVG, 8 nodes, pulses. Drag + spring-back; tap → guidance; graph reflows via <code class="inline">bottomInset</code>. <b>Bugs:</b> 0-width grid collapse → <code class="inline">width:100%</code>; panel overlap → inset reflow.</p><pre class="code">n.vx=(n.vx+(anchor.x-n.x)*0.016)*0.90; n.x+=n.vx;</pre></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>টানো-ছাড়ো-ফেরো; ট্যাপে পরামর্শ; গ্রাফ উপরে সরে।</p><div class="try">🧪 <b>Try:</b><ol><li>Node drag করো।</li><li>Tap → panel + link।</li></ol></div></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-06</span><div class="pv-label">index.html#hero<small>FIG.01 card</small></div><div class="pv-actions"><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button><a href="index.html#hero" target="_blank">Full ↗</a></div></div><div class="frame-wrap"><iframe src="index.html#hero" loading="lazy" title="PV-06"></iframe></div><div class="pv-look"><h4>👀 PV-06</h4><ol><li>① 8 nodes।</li><li>② Pulses on edges।</li><li>③ “Drag · tap” footnote।</li></ol></div></div></div></section>
+
+<!-- D7 §7 -->
+<section class="doc-sec" id="d7"><div class="sec-head"><div class="sec-num">7</div><div><h2><span lang="en">D7 · §7 Animated stats</span><span class="bn-h" lang="bn">৭. পরিসংখ্যান</span></h2><div class="chips"><span class="chip page">📄 index.html</span><span class="chip anchor">📍 #stats</span><span class="chip code">⚙️ IntersectionObserver 0.4 + rAF ease-out</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>500+ · 100+ · 50+ · 1 count from 0 when 40% visible; cubic ease-out 1.5s.</p><pre class="code">new IntersectionObserver(es=&gt;{es.forEach(en=&gt;{
+ if(en.isIntersecting)animate(en.target);});},
+ {threshold:0.4});</pre></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>দেখা গেলেই গুনে, শেষে ধীরে থামে।</p></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-07</span><div class="pv-label">index.html#stats<small>4 cards</small></div><div class="pv-actions"><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button><a href="index.html#stats" target="_blank">Full ↗</a></div></div><div class="frame-wrap"><iframe src="index.html#stats" loading="lazy" title="PV-07"></iframe></div><div class="pv-look"><h4>👀 PV-07</h4><ol><li>① 4 cards + icons।</li><li>② Reload → recount।</li><li>③ Same observer = card reveal।</li></ol></div></div></div></section>
+
+<!-- D8 §8 -->
+<section class="doc-sec" id="d8"><div class="sec-head"><div class="sec-num">8</div><div><h2><span lang="en">D8 · §8 Idea Explorer (search + AND filters + sort)</span><span class="bn-h" lang="bn">৮. এক্সপ্লোরার</span></h2><div class="chips"><span class="chip page">📄 research.html</span><span class="chip anchor">📍 #research-explorer controls</span><span class="chip code">⚙️ research.js results() · Array.filter</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>Live search + 4 AND filters + 5 sorts + empty state + Clear. Debounced 140ms.</p><pre class="code">list=TB_DATA.researchIdeas.filter(r=&gt;{
+ if(q&amp;&amp;hay.indexOf(q)===-1)return false;
+ if(cats.length&amp;&amp;!cats.includes(r.category))return false;
+ if(diff!=='All'&amp;&amp;r.difficulty!==diff)return false;
+ return true;});</pre></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>AND লজিক — সব শর্ত মিললে তবেই থাকে।</p><div class="try">🧪 <b>Try:</b><ol><li>“AI” + Intermediate।</li><li>“zzz” → empty + Clear।</li></ol></div></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-08</span><div class="pv-label">research.html — controls<small>search + chips + sort</small></div><div class="pv-actions"><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button><a href="research.html" target="_blank">Full ↗</a></div></div><div class="frame-wrap"><iframe src="research.html" loading="lazy" title="PV-08"></iframe></div><div class="pv-look"><h4>👀 PV-08</h4><ol><li>① Search box।</li><li>② “Filters N” pill।</li><li>③ Sort dropdown।</li></ol></div></div></div></section>
+
+<!-- D9 §9 -->
+<section class="doc-sec" id="d9"><div class="sec-head"><div class="sec-num">9</div><div><h2><span lang="en">D9 · §9 Details modal + bookmarks</span><span class="bn-h" lang="bn">৯. মডাল + বুকমার্ক</span></h2><div class="chips"><span class="chip page">📄 index.html</span><span class="chip anchor">📍 #research-explorer cards</span><span class="chip code">⚙️ openIdeaModal · toggleBookmark</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>View Details → problem/gap/method/outcome/supervisors. Bookmark = ID array + badge + Saved panel + toast. Pattern: read→modify→write.</p><pre class="code">TB.toggleBookmark=function(id){const a=
+ TB.state.get('tb_bookmarks',[]);const i=a.indexOf(id);
+ i&gt;-1?a.splice(i,1):a.push(id);TB.state.set('tb_bookmarks',a);};</pre></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>🔖 চাপলে badge বাড়ে, Saved-এ জমে।</p><div class="try">🧪 <b>Try:</b><ol><li>View Details খুলো।</li><li>🔖 → badge + toast।</li></ol></div></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-09</span><div class="pv-label">index.html#research-explorer<small>cards (D8 থেকে আলাদা ফাইল)</small></div><div class="pv-actions"><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button><a href="index.html#research-explorer" target="_blank">Full ↗</a></div></div><div class="frame-wrap"><iframe src="index.html#research-explorer" loading="lazy" title="PV-09"></iframe></div><div class="pv-look"><h4>👀 PV-09</h4><ol><li>① Cards + difficulty।</li><li>② View Details + 🔖।</li><li>③ Modal sections।</li></ol></div></div></div></section>
+
+<!-- D10 §10 -->
+<section class="doc-sec" id="d10"><div class="sec-head"><div class="sec-num">10</div><div><h2><span lang="en">D10 · §10 Supervisors + quiz (weighted demo)</span><span class="bn-h" lang="bn">১০. সুপারভাইজার + কুইজ</span></h2><div class="chips"><span class="chip page">📄 supervisors.html</span><span class="chip anchor">📍 #supervisor-match</span><span class="chip code">⚙️ matchScore() 45·25·15·10</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>12 profiles + combinable filters + 4-step quiz (area→techs→type→difficulty) → % with demo label. Not AI.</p><pre class="code">if(sup.areas.includes(ans.area))score+=45;
+score+=(hits/ans.techs.length)*25;
+if(sup.supervisionTypes.includes(ans.type))score+=15;
+score+=10;return Math.min(99,Math.round(score));</pre></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>এরিয়া ৪৫ · টুলস ২৫ · টাইপ ১৫ · ডিফিকাল্টি ১০।</p><div class="try">🧪 <b>Try:</b><ol><li>BUET filter।</li><li>Match Me → ৪ ধাপ → % bar।</li></ol></div></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-10</span><div class="pv-label">supervisors.html<small>directory + quiz</small></div><div class="pv-actions"><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button><a href="supervisors.html" target="_blank">Full ↗</a></div></div><div class="frame-wrap"><iframe src="supervisors.html" loading="lazy" title="PV-10"></iframe></div><div class="pv-look"><h4>👀 PV-10</h4><ol><li>① Filter row।</li><li>② 12 cards।</li><li>③ Match Me → % bar।</li></ol></div></div></div></section>
+
+<!-- D11 §11 -->
+<section class="doc-sec" id="d11"><div class="sec-head"><div class="sec-num">11</div><div><h2><span lang="en">D11 · §11 Roadmap (8 steps + %)</span><span class="bn-h" lang="bn">১১. রোডম্যাপ</span></h2><div class="chips"><span class="chip page">📄 index.html</span><span class="chip anchor">📍 #roadmap</span><span class="chip code">⚙️ publication.js renderRoadmap()</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>Click step → explanation + actions + resources. Complete → green + gradient line + “x% Complete”. Formula: done÷8×100.</p><pre class="code">pct=Math.round(done.length/steps.length*100);
+progressFill.style.width=pct+'%';</pre></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>Complete → সবুজ + লাইন + %। Refresh-এ থাকে।</p></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-11</span><div class="pv-label">index.html#roadmap<small>timeline</small></div><div class="pv-actions"><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button><a href="index.html#roadmap" target="_blank">Full ↗</a></div></div><div class="frame-wrap"><iframe src="index.html#roadmap" loading="lazy" title="PV-11"></iframe></div><div class="pv-look"><h4>👀 PV-11</h4><ol><li>① 8 nodes।</li><li>② Panel।</li><li>③ Mark Complete + %।</li></ol></div></div></div></section>
+
+<!-- D12 §12 -->
+<section class="doc-sec" id="d12"><div class="sec-head"><div class="sec-num">12</div><div><h2><span lang="en">D12 · §12 Publication guides + checklist</span><span class="bn-h" lang="bn">১২. পাবলিকেশন + চেকলিস্ট</span></h2><div class="chips"><span class="chip page">📄 publication.html</span><span class="chip anchor">📍 tabs: hub / checklist</span><span class="chip code">⚙️ renderChecklist() · input:checked~.cl-box</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>7 guide modals → Read badge. 8 checkboxes + bar “5/8 — 62%”, auto-saved. Custom box trick: real input hidden, styled span reacts.</p><pre class="code">&lt;input type="checkbox"&gt;&lt;span class="cl-box"&gt;✓&lt;/span&gt;
+/* input:checked ~ .cl-box → green */</pre></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>গাইড পড়লে Read ব্যাজ; টিক দিলে % বাড়ে।</p><div class="try">🧪 <b>Try:</b><ol><li>Guides tab → ১টা খুলো।</li><li>Checklist tab → ৫টা টিক → 62%।</li></ol></div></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-12</span><div class="pv-label">publication.html — tabbed<small>guides vs checklist</small></div><div class="pv-actions"><button class="goto active" data-goto="publication.html#publication-hub">① Guides</button><button class="goto" data-goto="publication.html#journal-checklist">② Checklist</button><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button></div></div><div class="frame-wrap"><iframe src="publication.html#publication-hub" loading="lazy" title="PV-12"></iframe></div><div class="pv-look"><h4>👀 PV-12</h4><ol><li>① 7 guide cards।</li><li>② Read ✓ badge।</li><li>③ Checklist bar + 8 rows।</li></ol></div></div></div></section>
+
+<!-- D13 §13 -->
+<section class="doc-sec" id="d13"><div class="sec-head"><div class="sec-num">13</div><div><h2><span lang="en">D13 · §13 Resource library</span><span class="bn-h" lang="bn">১৩. রিসোর্স লাইব্রেরি</span></h2><div class="chips"><span class="chip page">📄 resources.html</span><span class="chip anchor">📍 #resource-library</span><span class="chip code">⚙️ resources.js renderLibrary()</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>20 items · 9 categories. Tools (Zotero/Kaggle/Overleaf) → external links; guides → modals. Same empty-state pattern.</p></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>টুল → বাইরের লিংক, গাইড → মডাল।</p><div class="viva"><p>🎓 <b>Viva:</b> “Same filter pattern as explorer, different dataset.”</p></div></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-13</span><div class="pv-label">resources.html<small>search + chips</small></div><div class="pv-actions"><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button><a href="resources.html" target="_blank">Full ↗</a></div></div><div class="frame-wrap"><iframe src="resources.html" loading="lazy" title="PV-13"></iframe></div><div class="pv-look"><h4>👀 PV-13</h4><ol><li>① 9 chips।</li><li>② Tool vs Guide badge।</li><li>③ ↗ external icon।</li></ol></div></div></div></section>
+
+<!-- D14 §14 -->
+<section class="doc-sec" id="d14"><div class="sec-head"><div class="sec-num">14</div><div><h2><span lang="en">D14 · §14 FAQ accordion (CSS-only animation)</span><span class="bn-h" lang="bn">১৪. FAQ</span></h2><div class="chips"><span class="chip page">📄 about.html</span><span class="chip anchor">📍 #faq</span><span class="chip code">⚙️ grid 0fr→1fr · JS closes previous</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>8 Qs, one open. No JS height math — <code class="inline">grid-template-rows: 0fr→1fr</code> transition. JS only toggles <code class="inline">.open</code>.</p><pre class="code">.faq-a{display:grid;grid-template-rows:0fr;
+ transition:.32s;overflow:hidden}
+.faq-item.open .faq-a{grid-template-rows:1fr;}</pre></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>একবারে একটা খোলে; অ্যানিমেশন শুধু CSS।</p></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-14</span><div class="pv-label">about.html#faq<small>accordion</small></div><div class="pv-actions"><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button><a href="about.html#faq" target="_blank">Full ↗</a></div></div><div class="frame-wrap"><iframe src="about.html#faq" loading="lazy" title="PV-14"></iframe></div><div class="pv-look"><h4>👀 PV-14</h4><ol><li>① 8 items।</li><li>② Click → smooth open।</li><li>③ আগেরটা auto-close।</li></ol></div></div></div></section>
+
+<!-- D15 §15 -->
+<section class="doc-sec" id="d15"><div class="sec-head"><div class="sec-num">15</div><div><h2><span lang="en">D15 · §15 Login &amp; sign-up validation</span><span class="bn-h" lang="bn">১৫. লগইন-সাইনআপ</span></h2><div class="chips"><span class="chip page">📄 index.html</span><span class="chip anchor">📍 navbar Login → modal</span><span class="chip code">⚙️ openLogin/openSignup · EMAIL_RE</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>Required + email regex + min length + match. Red per-field errors. Demo success → local profile → navbar greets by initials.</p><pre class="code">const EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+if(!EMAIL_RE.test(email))err('valid email');
+if(pass.length&lt;8)err('at least 8');
+if(pass2!==pass)err('do not match');</pre></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>ভুলে লাল বার্তা; সফলে “Demo login” + নামে শুভেচ্ছা।</p><div class="try">🧪 <b>Try:</b><ol><li>Login → ভুল ইমেইল।</li><li>ছোট password।</li><li>অমিল password।</li></ol></div></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-15</span><div class="pv-label">index.html — Login focus<small>navbar Login চাপো</small></div><div class="pv-actions"><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button><a href="index.html" target="_blank">Full ↗</a></div></div><div class="frame-wrap"><iframe src="index.html" loading="lazy" title="PV-15"></iframe></div><div class="pv-look"><h4>👀 PV-15</h4><ol><li>① Navbar <code>Login / Get Started</code>।</li><li>② Modal fields + errors।</li><li>③ Success → avatar initials।</li></ol></div></div></div></section>
+
+<!-- D16 §16 -->
+<section class="doc-sec" id="d16"><div class="sec-head"><div class="sec-num">16</div><div><h2><span lang="en">D16 · §16 Dark mode (one attribute)</span><span class="bn-h" lang="bn">১৬. ডার্ক মোড</span></h2><div class="chips"><span class="chip page">📄 index.html</span><span class="chip anchor">📍 🌙 toggle · head anti-flash script</span><span class="chip code">⚙️ data-theme + CSS vars · tb_theme</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>All colors = variables. <code class="inline">data-theme="dark"</code> swaps values; 200+ rules follow; saved; head script prevents flash.</p><pre class="code">:root{--bg:#f5f8f6;--text:#15221d}
+[data-theme='dark']{--bg:#0c1512;--text:#e7f0ea}
+.card{background:var(--bg)}</pre></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>একটা attribute → পুরো সাইট; পছন্দ সেভ থাকে।</p><div class="try">🧪 <b>Try:</b><ol><li>🌙 চাপো → dark।</li><li>Refresh → dark-ই থাকে।</li></ol></div></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-16</span><div class="pv-label">index.html — 🌙 focus<small>D15 থেকে আলাদা: শুধু theme</small></div><div class="pv-actions"><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button><a href="index.html" target="_blank">Full ↗</a></div></div><div class="frame-wrap"><iframe src="index.html" loading="lazy" title="PV-16"></iframe></div><div class="pv-look"><h4>👀 PV-16</h4><ol><li>① 🌙 button।</li><li>② Cards + bg বদলায়।</li><li>③ কোনো “dark copy” CSS নেই।</li></ol></div></div></div></section>
+
+<!-- D17 §17 -->
+<section class="doc-sec" id="d17"><div class="sec-head"><div class="sec-num">17</div><div><h2><span lang="en">D17 · §17 Toasts + one modal system</span><span class="bn-h" lang="bn">১৭. টোস্ট + মডাল সিস্টেম</span></h2><div class="chips"><span class="chip page">📄 research.html</span><span class="chip anchor">📍 toast stack + any modal</span><span class="chip code">⚙️ TB.toast · TB.modal stack · Esc</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>Toasts slide in, 3.4s, max 4. <b>All 8 dialogs share one modal:</b> animation, X, backdrop (<code class="inline">e.target===overlay</code>), Esc closes topmost, focus return, scroll lock.</p><pre class="code">TB.modal.open({title,body,footer,size:'lg'});
+// Esc:
+stack[stack.length-1].close(); // topmost only</pre></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>৮ ডায়ালগ, ১ ফাংশন। Esc = উপরেরটা বন্ধ।</p><div class="try">🧪 <b>Try:</b><ol><li>🔖 → toast দেখো।</li><li>Modal → বাইরে ক্লিক / Esc।</li></ol></div></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-17</span><div class="pv-label">research.html — toast trigger<small>🔖 চাপো = toast</small></div><div class="pv-actions"><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button><a href="research.html" target="_blank">Full ↗</a></div></div><div class="frame-wrap"><iframe src="research.html" loading="lazy" title="PV-17"></iframe></div><div class="pv-look"><h4>👀 PV-17</h4><ol><li>① Toast bottom-right।</li><li>② Modal X/backdrop/Esc।</li><li>③ Quiz→profile = stacked modal।</li></ol></div></div></div></section>
+
+<!-- D18 §18 -->
+<section class="doc-sec" id="d18"><div class="sec-head"><div class="sec-num">18</div><div><h2><span lang="en">D18 · §18 Responsive (320→1440, zero overflow)</span><span class="bn-h" lang="bn">১৮. রেসপনসিভ</span></h2><div class="chips"><span class="chip page">📄 index.html</span><span class="chip anchor">📍 mobile 390px focus</span><span class="chip code">⚙️ auto-fill grid · scrollWidth test</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>Tested 320/375/768/1024/1440. Mobile: drawer, 1-col, collapsible filters, 44px targets, no h-scroll (measured <code class="inline">scrollWidth</code>). One grid line handles cards:</p><pre class="code">grid-template-columns:
+ repeat(auto-fill,minmax(310px,1fr));
+/* 1440→3-4 col · 375→1 col · same CSS */</pre></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>এক লাইন grid-ই কলাম বদলায়; পাশে স্ক্রল নেই।</p></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-18</span><div class="pv-label">index.html — MOBILE focus<small>390px চেপে রেখে দেখো</small></div><div class="pv-actions"><button data-dev="desktop">Desktop</button><button class="active" data-dev="mobile">Mobile 390px</button><button data-reload>⟳</button><a href="index.html" target="_blank">Full ↗</a></div></div><div class="frame-wrap mobile"><iframe src="index.html" loading="lazy" title="PV-18"></iframe></div><div class="pv-look"><h4>👀 PV-18</h4><ol><li>① ☰ drawer।</li><li>② 1-col cards।</li><li>③ Full-width buttons।</li></ol></div></div></div></section>
+
+<!-- D19 §19 -->
+<section class="doc-sec" id="d19"><div class="sec-head"><div class="sec-num">19</div><div><h2><span lang="en">D19 · §19 Data architecture (2 doors, backend-ready)</span><span class="bn-h" lang="bn">১৯. ডেটা আর্কিটেকচার</span></h2><div class="chips"><span class="chip page">📄 js/data.js + main.js</span><span class="chip anchor">📍 code-focus</span><span class="chip code">⚙️ data door + TB.state door</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>Content arrays in <code class="inline">data.js</code>; user state only via <code class="inline">TB.state</code> (+ <code class="inline">tb:change</code> broadcast). Backend = 2 files → <code class="inline">fetch('/api/…')</code>, UI untouched.</p><pre class="code">{id:1,title:"Explainable AI…",
+ category:"Artificial Intelligence",
+ technologies:["Python","PyTorch"]}</pre></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>দুই দরজা — কনটেন্ট ও ইউজার-স্টেট। পরে API বসালেই ব্যাকএন্ড।</p></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id code">&lt;/&gt; PV-19</span><div class="pv-label">data.js + TB.state (code-focus)</div></div><div class="codefocus">TB.state = {
+ get(k,d){ <span class="cm">try{const v=localStorage.getItem(k);</span>
+  <span class="cm">return v===null?d:JSON.parse(v);}catch(e){return d;}</span> },
+ set(k,v){ <span class="kw">localStorage.setItem(k,JSON.stringify(v));</span>
+  <span class="kw">document.dispatchEvent(new CustomEvent('tb:change'));</span> }
+};
+<span class="cm">// future: fetch('/api/ideas').then(r=&gt;r.json())</span></div><div class="pv-look"><h4>👀 PV-19</h4><ol><li>① stringify/parse কেন (text-only storage)।</li><li>② def default = safe।</li><li>③ tb:change = badge auto-update।</li></ol></div>
+<table class="map"><tr><th>Feature</th><th>File → fn</th></tr><tr><td>Search/filter</td><td><code>research.js → results()</code></td></tr><tr><td>Quiz</td><td><code>supervisors.js → matchScore()</code></td></tr><tr><td>Roadmap/checklist</td><td><code>publication.js</code></td></tr><tr><td>Library</td><td><code>resources.js → renderLibrary()</code></td></tr><tr><td>Modal/toast/state</td><td><code>main.js → TB.*</code></td></tr><tr><td>Physics</td><td><code>network.js → physics()</code></td></tr></table></div></div></section>
+
+<!-- D20 §20 -->
+<section class="doc-sec" id="d20"><div class="sec-head"><div class="sec-num">20</div><div><h2><span lang="en">D20 · §20 How to run</span><span class="bn-h" lang="bn">২০. চালানোর নিয়ম</span></h2><div class="chips"><span class="chip page">📄 terminal</span><span class="chip anchor">📍 code-focus</span><span class="chip code">⚙️ double-click OR python server</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p>Easy: double-click <code class="inline">index.html</code>. Recommended: local server (like real hosting).</p></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>সহজ = ডাবল-ক্লিক; ভালো = Python সার্ভার।</p></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id code">&lt;/&gt; PV-20</span><div class="pv-label">Run commands</div><div class="pv-actions"><a href="index.html" target="_blank">Open index ↗</a><a href="about.html" target="_blank">Open about ↗</a></div></div><div class="codefocus">cd thesisbridge-bd
+python -m http.server 8417
+<span class="cm"># open → http://127.0.0.1:8417/index.html</span></div><div class="pv-look"><h4>👀 PV-20</h4><ol><li>① Server = সব iframe-ও live।</li><li>② file:// তে anchor কম চলে → server ভালো।</li></ol></div></div></div></section>
+
+<!-- D21 §21 -->
+<section class="doc-sec" id="d21"><div class="sec-head"><div class="sec-num">21</div><div><h2><span lang="en">D21 · §21 Limits &amp; future plan</span><span class="bn-h" lang="bn">২১. সীমাবদ্ধতা ও ভবিষ্যৎ</span></h2><div class="chips"><span class="chip page">📄 about.html</span><span class="chip anchor">📍 honesty section</span><span class="chip code">⚙️ sample · local-only · simulated auth · demo match</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><ul class="tight"><li>Sample/fictional data — needs verified faculty.</li><li>No server — one browser, no sync.</li><li>Simulated auth — no hash/JWT.</li><li>Demo match — labelled in UI.</li></ul><p><b>Next:</b> API + DB → replace 2 doors → real auth → admin. No UI rewrite.</p></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>সীমা স্বীকার + পরিকল্পনা — ভাইভায় প্লাস পয়েন্ট।</p></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-21</span><div class="pv-label">about.html — honesty context<small>“demo data” footer দেখো</small></div><div class="pv-actions"><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button><a href="about.html" target="_blank">Full ↗</a></div></div><div class="frame-wrap"><iframe src="about.html" loading="lazy" title="PV-21"></iframe></div><div class="pv-look"><h4>👀 PV-21</h4><ol><li>① Footer: “All data is demo data”।</li><li>② Quiz-এ “demo” label।</li><li>③ Login-এ “Demo” success।</li></ol></div></div></div></section>
+
+<!-- D22 §22 -->
+<section class="doc-sec" id="d22"><div class="sec-head"><div class="sec-num">22</div><div><h2><span lang="en">D22 · §22 Likely viva Q&A (7)</span><span class="bn-h" lang="bn">২২. ভাইভা প্রশ্নোত্তর</span></h2><div class="chips"><span class="chip page">📄 viva prep</span><span class="chip anchor">📍 QA panel (no nav needed)</span><span class="chip code">⚙️ 1-sentence answers</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en">
+<div class="viva"><p><b>Vanilla why?</b> Hand-built → every line explainable; doors keep backend-ready.</p></div>
+<div class="viva"><p><b>Data where?</b> <code class="inline">data.js</code> arrays + <code class="inline">TB.state</code>/localStorage.</p></div>
+<div class="viva"><p><b>Filters?</b> AND via <code class="inline">Array.filter</code> — must pass all.</p></div>
+<div class="viva"><p><b>Real AI?</b> No — weighted demo, labelled.</p></div>
+<div class="viva"><p><b>Hardest bug?</b> Drawer sliver → ::before blur (fixed-position rule).</p></div>
+<div class="viva"><p><b>Responsive test?</b> 320–1440 + <code class="inline">scrollWidth</code> check.</p></div>
+<div class="viva"><p><b>Backend?</b> Replace 2 doors with API; UI untouched.</p></div></div>
+<div lang="bn"><span class="bn-tag">বাংলা</span><p>প্রতিটা ১ বাক্যে মুখস্থ — ডানের টেবিল ঢেকে প্র্যাকটিস করো।</p></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id code">&lt;/&gt; PV-22</span><div class="pv-label">7 Q&A quick table</div></div><table class="map"><tr><th>Q</th><th>1-line A (§)</th></tr><tr><td>Vanilla why?</td><td>Explainable + backend-ready (§2)</td></tr><tr><td>Data where?</td><td>data.js + TB.state (§19)</td></tr><tr><td>Filters?</td><td>AND filter (§8)</td></tr><tr><td>AI?</td><td>Weighted demo (§10)</td></tr><tr><td>Hardest bug?</td><td>::before blur (§5)</td></tr><tr><td>Responsive?</td><td>scrollWidth proof (§18)</td></tr><tr><td>Backend?</td><td>2 doors → fetch (§19)</td></tr></table><div class="pv-look"><h4>👀 PV-22</h4><ol><li>① ডান কলাম ঢেকে বলো।</li><li>② § লিংকে jump করো।</li></ol></div></div></div></section>
+
+<!-- D23 §23 -->
+<section class="doc-sec" id="d23"><div class="sec-head"><div class="sec-num">23</div><div><h2><span lang="en">D23 · §23 Code walkthrough A–J (line by line)</span><span class="bn-h" lang="bn">২৩. কোড ওয়াকথ্রু</span></h2><div class="chips"><span class="chip page">📄 research/main/supervisors/network</span><span class="chip anchor">📍 Ctrl+F function name</span><span class="chip code">⚙️ A render · B delegate · C debounce · D state · E stack · F ease · G score · H spring · I theme · J console</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en">
+<p><b>A renderGrid:</b> <code class="inline">map</code>→HTML + <code class="inline">TB.esc</code> (XSS) + <code class="inline">join</code> (1 write) + <code class="inline">data-id</code>.</p>
+<p><b>B delegation:</b> container listener + <code class="inline">closest([data-action])</code> survives re-render.</p>
+<p><b>C debounce:</b> 140ms silence → 1 render. <code class="inline">clearTimeout+setTimeout</code>.</p>
+<p><b>D state:</b> JSON text door + def default + <code class="inline">tb:change</code>.</p>
+<p><b>E modal:</b> stack; <code class="inline">e.target===overlay</code>; Esc topmost; 230ms exit.</p>
+<p><b>F counter:</b> p 0→1, <code class="inline">1-(1-p)³</code> (p=.5→87%), rAF 60fps.</p>
+<p><b>G score:</b> 45+25+15+10, <code class="inline">min(99)</code> never fake 100.</p>
+<p><b>H spring:</b> distance×0.016 pull + inertia ×0.90 damping.</p>
+<p><b>I theme:</b> <code class="inline">var(--bg)</code> live lookup; attr flips all.</p>
+<p><b>J console:</b> <code class="inline">TB_DATA…length→20 · TB.toast('Hi')</code>.</p></div>
+<div lang="bn"><span class="bn-tag">বাংলা</span><p>ফাইলে Ctrl+F → ফাংশন → লাইন ধরে বলো। J দিয়ে শিক্ষককে live দেখাও।</p></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id code">&lt;/&gt; PV-23</span><div class="pv-label">A–J locate map</div></div><div class="codefocus"><span class="kw">A</span> research.js → renderGrid()   <span class="cm">map+esc+join</span>
+<span class="kw">B</span> research.js → closest()      <span class="cm">delegation</span>
+<span class="kw">C</span> main.js → TB.debounce(140)   <span class="cm">1 render</span>
+<span class="kw">D</span> main.js → TB.state           <span class="cm">JSON+event</span>
+<span class="kw">E</span> main.js → TB.modal stack     <span class="cm">Esc top</span>
+<span class="kw">F</span> main.js → tick ease-out      <span class="cm">1-(1-p)^3</span>
+<span class="kw">G</span> supervisors.js → matchScore  <span class="cm">45/25/15/10</span>
+<span class="kw">H</span> network.js → 0.016 × 0.90    <span class="cm">spring</span>
+<span class="kw">I</span> main.js → dataset.theme      <span class="cm">vars flip</span>
+<span class="kw">J</span> console → TB_DATA / TB.toast <span class="cm">live proof</span></div><div class="pv-look"><h4>👀 PV-23</h4><ol><li>① F12 Console-এ J চালাও।</li><li>② badge jump দেখাও।</li></ol></div></div></div></section>
+
+<!-- D24 §24 -->
+<section class="doc-sec" id="d24"><div class="sec-head"><div class="sec-num">24</div><div><h2><span lang="en">D24 · §24 Viva drill (both directions)</span><span class="bn-h" lang="bn">২৪. ভাইভা ড্রিল</span></h2><div class="chips"><span class="chip page">📄 site + code</span><span class="chip anchor">📍 practice: cover right column</span><span class="chip code">⚙️ A site→code · B code→meaning</span></div></div></div>
+<div class="split"><div class="doc-text"><div lang="en"><p><b>A:</b> teacher points at UI → you say file+fn+1 sentence (burger→<code class="inline">initNav</code>, badge→<code class="inline">toggleBookmark</code>, 94%→<code class="inline">matchScore</code>, FIG.01→<code class="inline">physics</code>…). <b>B:</b> teacher shows line → you identify (<code class="inline">0fr→1fr</code>=accordion, <code class="inline">closest</code>=delegation, <code class="inline">min(99)</code>=no fake 100%…).</p></div><div lang="bn"><span class="bn-tag">বাংলা</span><p>এক উইন্ডোতে সাইট, একটায় এই পেজ। বন্ধু row বাছবে, তুমি মুখে বলবে। দিনে ১০ মিনিট।</p></div></div>
+<div class="preview"><div class="pv-bar"><span class="pv-id">PV-24</span><div class="pv-label">Drill ground<small>index.html — point &amp; say</small></div><div class="pv-actions"><button class="active" data-dev="desktop">Desktop</button><button data-dev="mobile">Mobile</button><button data-reload>⟳</button><a href="index.html" target="_blank">Full ↗</a></div></div><div class="frame-wrap"><iframe src="index.html" loading="lazy" title="PV-24"></iframe></div><div class="pv-look"><h4>👀 PV-24 drill</h4><ol><li>① Random element দেখাও → file+fn বলো (D5–D17)।</li><li>② F12-এ random line → অর্থ বলো (D23)।</li><li>③ 10 min/day = full site।</li></ol></div><table class="map"><tr><th>See…</th><th>Say…</th></tr><tr><td><code>0fr→1fr</code></td><td>Accordion, no JS height (§14)</td></tr><tr><td><code>closest([data-action])</code></td><td>Delegation (§23-B)</td></tr><tr><td><code>140ms debounce</code></td><td>1 render (§23-C)</td></tr><tr><td><code>min(99)</code></td><td>No fake 100% (§10)</td></tr><tr><td><code>auto-fill minmax</code></td><td>No-query columns (§18)</td></tr></table></div></div></section>
+
+</div>
+<footer class="doc">ThesisBridge BD — Visual Docs 24/24 (docs2.html) · Nasif Shahrear (CSE22 · ID 2) · docs.html §1–§24 fully covered</footer>
+<script>
+(function(){var b=document.querySelectorAll('.lang-switch button');function a(m){document.body.dataset.lang=m;try{localStorage.setItem('tb_docs2_lang',m)}catch(e){}b.forEach(function(x){x.classList.toggle('active',x.dataset.mode===m)})}b.forEach(function(x){x.addEventListener('click',function(){a(x.dataset.mode)})});var s='both';try{s=localStorage.getItem('tb_docs2_lang')||'both'}catch(e){}a(s);
+document.querySelectorAll('.preview').forEach(function(pv){var w=pv.querySelector('.frame-wrap'),f=pv.querySelector('iframe');pv.querySelectorAll('[data-dev]').forEach(function(x){x.addEventListener('click',function(){pv.querySelectorAll('[data-dev]').forEach(function(y){y.classList.remove('active')});x.classList.add('active');if(w)w.classList.toggle('mobile',x.dataset.dev==='mobile')})});pv.querySelectorAll('[data-goto]').forEach(function(x){x.addEventListener('click',function(){pv.querySelectorAll('[data-goto]').forEach(function(y){y.classList.remove('active')});x.classList.add('active');if(f)f.src=x.dataset.goto})});var r=pv.querySelector('[data-reload]');if(r&&f)r.addEventListener('click',function(){f.src=f.src})});})();
+</script>
+</body>
+</html>

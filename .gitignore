@@ -1,0 +1,19 @@
+# Secrets and local machine files that must not be uploaded to Git/Vercel.
+
+# Real environment variables (contains the Supabase service role key).
+.env
+.env.local
+
+# Python cache and virtual environments.
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Vercel local folder.
+.vercel/
+
+# OS noise.
+.DS_Store
+Thumbs.db

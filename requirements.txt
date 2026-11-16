@@ -1,0 +1,12 @@
+# Python packages for the ThesisBridge BD backend.
+# Install locally with:  pip install -r requirements.txt
+#
+# Vercel installs this same file automatically during deployment.
+# Version ranges (>=) are used instead of exact pins so the project keeps
+# working with newer releases and with newer Python versions.
+
+fastapi>=0.115
+uvicorn[standard]>=0.30
+supabase>=2.11
+python-dotenv>=1.0
+pydantic[email]>=2.8

@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ThesisBridge BD — Project Documentation (Prep) </title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Standalone prep document — independent of the website's CSS */
+  :root {
+    --ink: #1c2a24; --muted: #5a6f66; --line: #dfe8e2; --paper: #f5f8f6;
+    --card: #ffffff; --green: #0b6e4f; --green-soft: #e3f2ec; --red: #c24051;
+    --code-bg: #10231c; --code-ink: #d9efe5; --bn: #0b6e4f;
+    --sans: 'Inter', system-ui, sans-serif; --head: 'Sora', sans-serif;
+    --mono: 'JetBrains Mono', Consolas, monospace; --bengali: 'Hind Siliguri', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: var(--sans); color: var(--ink); background: var(--paper); line-height: 1.7; font-size: 16px; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 22px 90px; }
+
+  header.doc { background: linear-gradient(130deg, #0b6e4f, #0e8a63); color: #fff; padding: 46px 22px 40px; }
+  header.doc .wrap { padding-bottom: 0; }
+  .kicker { font-family: var(--mono); font-size: 12px; letter-spacing: .22em; opacity: .85; }
+  header.doc h1 { font-family: var(--head); font-size: clamp(26px, 4.5vw, 38px); margin: 10px 0 6px; }
+  header.doc p.sub { margin: 0 0 16px; opacity: .92; }
+  .byline { font-size: 14px; opacity: .9; }
+  .byline strong { font-weight: 700; }
+
+  .lang-switch { display: inline-flex; gap: 6px; margin-top: 18px; background: rgba(255,255,255,.14); padding: 5px; border-radius: 12px; }
+  .lang-switch button { border: 0; background: transparent; color: #fff; font: 600 14px var(--sans); padding: 7px 16px; border-radius: 8px; cursor: pointer; }
+  .lang-switch button.active { background: #fff; color: var(--green); }
+
+  nav.toc { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px 24px; margin: 26px 0 10px; }
+  nav.toc h2 { font-family: var(--head); font-size: 16px; margin: 0 0 10px; }
+  nav.toc ol { margin: 0; padding-left: 22px; columns: 2; column-gap: 34px; }
+  nav.toc li { margin: 3px 0; break-inside: avoid; }
+  nav.toc a { color: var(--green); text-decoration: none; font-weight: 500; font-size: 14.5px; }
+  nav.toc a:hover { text-decoration: underline; }
+  nav.toc .bn-t { color: var(--muted); font-family: var(--bengali); }
+
+  section.doc-sec { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 26px 28px; margin: 22px 0; }
+  section.doc-sec h2 { font-family: var(--head); font-size: 21px; margin: 0 0 14px; line-height: 1.35; }
+  section.doc-sec h2 .bn-h { display: block; font-size: 18px; color: var(--bn); font-family: var(--bengali); font-weight: 600; margin-top: 2px; }
+  h3.mini .bn-h { display: block; font-size: 14px; color: var(--bn); font-family: var(--bengali); font-weight: 600; margin-top: 2px; }
+  h3.mini { font-family: var(--head); font-size: 15.5px; margin: 20px 0 8px; }
+
+  div[lang="bn"] p, div[lang="bn"] li { font-family: var(--bengali); font-size: 16.5px; }
+  .lang-block { margin: 8px 0 14px; }
+  body[data-lang="en"] [lang="bn"], body[data-lang="bn"] [lang="en"] { display: none; }
+  body:not([data-lang="both"]) .lang-block { margin-bottom: 4px; }
+  .bn-tag { display: inline-block; font-family: var(--bengali); font-size: 11.5px; font-weight: 700; color: var(--bn); background: var(--green-soft); border-radius: 6px; padding: 1px 8px; margin-bottom: 6px; }
+  body[data-lang="bn"] .bn-tag { display: none; }
+
+  pre.code { background: var(--code-bg); color: var(--code-ink); border-radius: 12px; padding: 16px 18px; overflow-x: auto; font-family: var(--mono); font-size: 13px; line-height: 1.65; margin: 10px 0 6px; }
+  code.inline { font-family: var(--mono); font-size: 13px; background: var(--green-soft); color: var(--green); border-radius: 5px; padding: 1px 6px; }
+  .code-cap { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin: 0 0 14px; }
+  .code-cap b { color: var(--green); }
+
+  table.map { width: 100%; border-collapse: collapse; font-size: 14px; margin: 10px 0 6px; }
+  table.map th, table.map td { border: 1px solid var(--line); padding: 8px 11px; text-align: left; vertical-align: top; }
+  table.map th { background: var(--green-soft); color: var(--green); font-family: var(--head); font-size: 13px; }
+  table.map td code { font-family: var(--mono); font-size: 12.5px; color: var(--green); }
+  .table-note { font-size: 13.5px; color: var(--muted); }
+
+  .qa { border-left: 3px solid var(--green); background: var(--green-soft); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 12px 0; }
+  .qa p { margin: 0 0 6px; }
+  .qa .q { font-weight: 700; }
+  .qa div[lang="bn"] p { margin: 0; }
+  ul.tight { margin: 6px 0 12px; padding-left: 22px; }
+  ul.tight li { margin: 4px 0; }
+  .pill { display: inline-block; font-family: var(--mono); font-size: 11.5px; font-weight: 600; background: var(--green-soft); color: var(--green); border-radius: 999px; padding: 2px 10px; margin: 0 4px 6px 0; }
+  .warn { background: #fdf3e4; border: 1px solid #ecd9b0; border-radius: 10px; padding: 12px 16px; font-size: 14.5px; margin: 12px 0; }
+  div[lang="bn"] .warn-text { font-family: var(--bengali); }
+
+  footer.doc { text-align: center; color: var(--muted); font-size: 13.5px; padding: 10px 22px 40px; }
+
+  @media (max-width: 640px) { nav.toc ol { columns: 1; } section.doc-sec { padding: 20px 18px; } }
+  @media print {
+    body { background: #fff; }
+    .lang-switch { display: none; }
+    section.doc-sec { border: 0; padding: 10px 0; break-inside: avoid-page; }
+    header.doc { padding: 20px 0; }
+    pre.code { white-space: pre-wrap; }
+  }
+</style>
+</head>
+<body data-lang="both">
+
+<!-- =========================================================================
+     BACKEND UPDATE BANNER (added with the Python + Supabase backend)
+     The long sections below were written for the original frontend-only
+     prototype. Kept as-is for the history, with this notice on top.
+     ========================================================================= -->
+<div style="background:#0b6e4f;color:#fff;padding:14px 22px;font:600 14px/1.6 Inter,system-ui,sans-serif">
+  <strong>Update · November 2026:</strong> ThesisBridge BD now runs on a
+  <strong>Python (FastAPI) backend</strong> with a <strong>Supabase PostgreSQL</strong> database.
+  Accounts use Supabase Auth; bookmarks, saved supervisors, roadmap progress,
+  read guides, checklist ticks and connection requests are stored in Supabase.
+  Sections 1, 15, 19, 20 and 21 below describe the original frontend-only build —
+  the current setup is documented in <code style="background:#fff;color:#0b6e4f;padding:1px 6px;border-radius:4px">SETUP.md</code>
+  and <code style="background:#fff;color:#0b6e4f;padding:1px 6px;border-radius:4px">WORK_HISTORY.md</code> in the project root.
+  <span lang="bn" style="display:block;font-family:'Hind Siliguri',sans-serif;font-weight:500;margin-top:4px">
+    হালনাগাদ · নভেম্বর ২০২৬: এখন <strong>Python (FastAPI) ব্যাকএন্ড</strong> ও <strong>Supabase PostgreSQL</strong> ডেটাবেস আছে।
+    অ্যাকাউন্ট চলে Supabase Auth দিয়ে; বুকমার্ক, সেভ করা সুপারভাইজার, রোডম্যাপ প্রোগ্রেস, পড়া গাইড, চেকলিস্ট ও কানেকশন রিকোয়েস্ট Supabase-এ জমা হয়।
+    নিচের ১, ১৫, ১৯, ২০ ও ২১ নম্বর অংশ পুরোনো ফ্রন্টএন্ড-প্রোটোটাইপের বর্ণনা; বর্তমান সেটআপ প্রজেক্ট রুটের
+    <code style="background:#fff;color:#0b6e4f;padding:1px 6px;border-radius:4px">SETUP.md</code> ও
+    <code style="background:#fff;color:#0b6e4f;padding:1px 6px;border-radius:4px">WORK_HISTORY.md</code>-এ আছে।
+  </span>
+</div>
+
+<header class="doc">
+  <div class="wrap">
+    <span class="kicker">PROJECT DOCUMENTATION · FRONTEND PROTOTYPE</span>
+    <h1>ThesisBridge BD — How It Was Built</h1>
+    <p class="sub">A complete, simple explanation of every feature, with real code examples — prepared for academic presentation.</p>
+    <p class="byline">Prepared by <strong>Nasif Shahrear</strong> — CSE22 · ID 2 · HTML5 + CSS3 + Vanilla JavaScript (no frameworks)</p>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-mode="both" class="active">Both</button>
+      <button type="button" data-mode="en">English</button>
+      <button type="button" data-mode="bn">বাংলা</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <nav class="toc">
+    <h2>Contents <span class="bn-t">· সূচিপত্র</span></h2>
+    <ol>
+      <li><a href="#s1">Overview <span class="bn-t">পরিচিতি</span></a></li>
+      <li><a href="#s2">Technologies <span class="bn-t">টেকনোলজি</span></a></li>
+      <li><a href="#s3">File structure <span class="bn-t">ফাইল স্ট্রাকচার</span></a></li>
+      <li><a href="#s4">How the app works <span class="bn-t">কাজের ধারা</span></a></li>
+      <li><a href="#s5">Navigation <span class="bn-t">নেভিগেশন</span></a></li>
+      <li><a href="#s6">Research Network hero <span class="bn-t">হিরো অংশ</span></a></li>
+      <li><a href="#s7">Animated statistics <span class="bn-t">পরিসংখ্যান</span></a></li>
+      <li><a href="#s8">Idea Explorer <span class="bn-t">আইডিয়া এক্সপ্লোরার</span></a></li>
+      <li><a href="#s9">Details &amp; bookmarks <span class="bn-t">বিস্তারিত ও বুকমার্ক</span></a></li>
+      <li><a href="#s10">Supervisor matching <span class="bn-t">সুপারভাইজার ম্যাচিং</span></a></li>
+      <li><a href="#s11">Research roadmap <span class="bn-t">রোডম্যাপ</span></a></li>
+      <li><a href="#s12">Publication &amp; checklist <span class="bn-t">পাবলিকেশন</span></a></li>
+      <li><a href="#s13">Resource library <span class="bn-t">রিসোর্স লাইব্রেরি</span></a></li>
+      <li><a href="#s14">FAQ accordion <span class="bn-t">এফএকিউ</span></a></li>
+      <li><a href="#s15">Login &amp; sign-up <span class="bn-t">লগইন-সাইনআপ</span></a></li>
+      <li><a href="#s16">Dark mode <span class="bn-t">ডার্ক মোড</span></a></li>
+      <li><a href="#s17">Toasts &amp; modals <span class="bn-t">টোস্ট ও মডাল</span></a></li>
+      <li><a href="#s18">Responsive + bug fixes <span class="bn-t">রেসপনসিভ</span></a></li>
+      <li><a href="#s19">Data architecture <span class="bn-t">ডেটা আর্কিটেকচার</span></a></li>
+      <li><a href="#s20">How to run <span class="bn-t">চালানোর নিয়ম</span></a></li>
+      <li><a href="#s21">Limitations &amp; future <span class="bn-t">সীমাবদ্ধতা</span></a></li>
+      <li><a href="#s22">Viva questions <span class="bn-t">ভাইভা প্রশ্ন</span></a></li>
+      <li><a href="#s23">Code walkthrough <span class="bn-t">কোড ওয়াকথ্রু</span></a></li>
+      <li><a href="#s24">Viva drill tables <span class="bn-t">ড্রিল টেবিল</span></a></li>
+    </ol>
+  </nav>
+
+  <!-- ==================== 1. OVERVIEW ==================== -->
+  <section class="doc-sec" id="s1">
+    <h2><span lang="en">1. What is ThesisBridge BD?</span><span class="bn-h" lang="bn">১. ThesisBridge BD কী?</span></h2>
+    <div class="lang-block" lang="en">
+      <p>ThesisBridge BD is a <b>frontend web application</b> — a "digital hub" for Bangladeshi university students. It solves one problem: students waste months searching for a thesis topic, a supervisor, and publication guidance, all scattered across different places. This platform puts the <b>whole journey in one website</b>: find an idea → find a supervisor → follow a roadmap → publish a paper.</p>
+      <p>It is a <b>full-stack application</b>: the interface is plain HTML, CSS and JavaScript, while the content, accounts and saved data are served by a <b>Python (FastAPI) backend</b> and a <b>Supabase PostgreSQL</b> database. Bookmarks, saved supervisors, roadmap progress, read guides, checklist ticks and connection requests are stored per user in the database.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p><b>ThesisBridge BD</b> হলো একটি ফ্রন্টএন্ড ওয়েব অ্যাপ্লিকেশন — বাংলাদেশি বিশ্ববিদ্যালয়ের শিক্ষার্থীদের জন্য একটি "ডিজিটাল হাব"। সমস্যাটা হলো, শিক্ষার্থীরা থিসিসের আইডিয়া, সুপারভাইজার আর পাবলিকেশনের নিয়ম খুঁজতে মাসের পর মাস নষ্ট করে, কারণ জিনিসগুলো ভিন্ন ভিন্ন জায়গায় ছড়িয়ে-ছিটিয়ে থাকে। এই ওয়েবসাইটে পুরো যাত্রাটা এক জায়গায় আছে: আইডিয়া খোঁজা → সুপারভাইজার খোঁজা → রোডম্যাপ অনুসরণ করা → পেপার পাবলিশ করা।</p>
+      <p>এটি একটি <b>ফুল-স্ট্যাক অ্যাপ্লিকেশন</b> — ইন্টারফেস সাধারণ HTML, CSS ও JavaScript, আর কনটেন্ট, অ্যাকাউন্ট ও সেভ করা ডেটা আসে <b>Python (FastAPI) ব্যাকএন্ড</b> ও <b>Supabase PostgreSQL</b> ডেটাবেস থেকে। বুকমার্ক, সেভ করা সুপারভাইজার, রোডম্যাপ প্রোগ্রেস, পড়া গাইড, চেকলিস্ট ও কানেকশন রিকোয়েস্ট প্রতিটি ব্যবহারকারীর জন্য ডেটাবেসে জমা থাকে।</p>
+    </div>
+    <div class="lang-block" lang="en">
+      <h3 class="mini">The numbers inside the prototype</h3>
+      <span class="pill">20 research ideas</span><span class="pill">12 supervisor profiles</span><span class="pill">20 resources</span><span class="pill">7 publication guides</span><span class="pill">8 roadmap steps</span><span class="pill">8 FAQs</span><span class="pill">6 pages</span>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>প্রোটোটাইপের ভেতরে আছে: <b>২০টি</b> রিসার্চ আইডিয়া, <b>১২টি</b> সুপারভাইজার প্রোফাইল, <b>২০টি</b> রিসোর্স, <b>৭টি</b> পাবলিকেশন গাইড, <b>৮ ধাপের</b> রোডম্যাপ, <b>৮টি</b> FAQ এবং মোট <b>৬টি</b> পেজ।</p>
+    </div>
+  </section>
+
+  <!-- ==================== 2. TECHNOLOGY ==================== -->
+  <section class="doc-sec" id="s2">
+    <h2><span lang="en">2. Technologies used</span><span class="bn-h" lang="bn">২. যে টেকনোলজিগুলো ব্যবহার করা হয়েছে</span></h2>
+    <div class="lang-block" lang="en">
+      <ul class="tight">
+        <li><b>HTML5</b> — the structure of the 6 pages.</li>
+        <li><b>CSS3</b> — all design: colors, layout (CSS Grid + Flexbox), animations, dark mode using CSS variables.</li>
+        <li><b>Vanilla JavaScript (ES5/ES6)</b> — every interaction: search, filters, modals, quizzes, saving data. <b>No React, no Vue, no jQuery.</b></li>
+        <li><b>Font Awesome</b> — icons. <b>Google Fonts</b> — Sora, Inter, JetBrains Mono.</li>
+        <li><b>localStorage</b> — browser storage used to remember user data (instead of a database).</li>
+      </ul>
+      <p><b>Why no framework?</b> A framework was not required, and vanilla JS proves the logic is understood at a deeper level — every feature is built by hand, so every line in the viva can be explained.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <ul class="tight">
+        <li><b>HTML5</b> — ৬টি পেজের গঠন।</li>
+        <li><b>CSS3</b> — পুরো ডিজাইন: রঙ, লেআউট (CSS Grid + Flexbox), অ্যানিমেশন, CSS variables দিয়ে ডার্ক মোড।</li>
+        <li><b>Vanilla JavaScript</b> — সব ইন্টার‍্যাকশন: সার্চ, ফিল্টার, মডাল, কুইজ, ডেটা সেভ। <b>কোনো React, Vue বা jQuery ব্যবহার করা হয়নি।</b></li>
+        <li><b>Font Awesome</b> — আইকনের জন্য, <b>Google Fonts</b> — ফন্টের জন্য।</li>
+        <li><b>localStorage</b> — ব্রাউজারের স্টোরেজ, যেখানে ইউজারের ডেটা সেভ হয় (ডেটাবেসের বিকল্প হিসেবে)।</li>
+      </ul>
+      <p><b>ফ্রেমওয়ার্ক কেন নেই?</b> কারণ প্রোটোটাইপে ফ্রেমওয়ার্ক লাগে না, আর vanilla JS-এ বানালে প্রতিটি লজিক নিজের হাতে লেখা — ভাইভাতে যেকোনো লাইনের ব্যাখ্যা দেওয়া সম্ভব।</p>
+    </div>
+  </section>
+
+  <!-- ==================== 3. FILE STRUCTURE ==================== -->
+  <section class="doc-sec" id="s3">
+    <h2><span lang="en">3. File structure</span><span class="bn-h" lang="bn">৩. ফাইল স্ট্রাকচার</span></h2>
+    <pre class="code">thesisbridge-bd/
+├── index.html          → Home (hero, stats, explorer, matching, roadmap, FAQ)
+├── research.html       → Full-page Research Idea Explorer
+├── supervisors.html    → Supervisor directory + matching quiz
+├── publication.html    → Publication guides + journal checklist
+├── resources.html      → Resource library (search + filter)
+├── about.html          → Mission, how-it-works, FAQ
+├── css/
+│   ├── style.css       → Design system: themes, components, modals, toasts
+│   └── responsive.css  → Breakpoints for mobile / tablet / desktop
+├── js/
+│   ├── data.js         → ALL sample data (ideas, supervisors, resources…)
+│   ├── main.js         → Core: state, toasts, modals, theme, navbar, auth
+│   ├── network.js      → Hero "Research Network" (draggable SVG graph)
+│   ├── research.js     → Idea explorer logic
+│   ├── supervisors.js  → Supervisor logic + matching quiz
+│   ├── publication.js  → Roadmap, guides, checklist
+│   └── resources.js    → Resource library logic
+└── assets/icons/       → Logo + favicon (SVG)</pre>
+    <div class="lang-block" lang="en">
+      <p class="table-note">The idea is <b>separation of concerns</b>: HTML holds structure, CSS holds design, <code class="inline">data.js</code> holds data, and each feature has its own JavaScript file. That is why later any file can be replaced without breaking the others.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p class="table-note">মূল কথা হলো <b>আলাদা আলাদা দায়িত্ব আলাদা ফাইলে</b> রাখা: HTML-এ কাঠামো, CSS-এ ডিজাইন, <code class="inline">data.js</code>-এ ডেটা, আর প্রতিটি ফিচারের নিজস্ব JavaScript ফাইল। এভাবে ভাগ করায় পরে যেকোনো একটা ফাইল বদলেও বাকিগুলো ভাঙে না।</p>
+    </div>
+  </section>
+
+  <!-- ==================== 4. HOW IT WORKS ==================== -->
+  <section class="doc-sec" id="s4">
+    <h2><span lang="en">4. How the app works (the flow)</span><span class="bn-h" lang="bn">৪. অ্যাপটি কীভাবে কাজ করে (পুরো ধারা)</span></h2>
+    <div class="lang-block" lang="en">
+      <p><b>Step 1:</b> Browser opens the HTML page. <b>Step 2:</b> CSS applies the design. <b>Step 3:</b> JavaScript files run — each module finds its mount point using a <code class="inline">data-mount</code> attribute and renders content from <code class="inline">data.js</code>. <b>Step 4:</b> When the user clicks/filters/saves, JavaScript updates the page and writes state to <code class="inline">localStorage</code>. <b>Step 5:</b> On the next visit, saved state is read back — so bookmarks and progress survive refresh.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p><b>ধাপ ১:</b> ব্রাউজার HTML পেজটি খোলে। <b>ধাপ ২:</b> CSS ডিজাইন বসিয়ে দেয়। <b>ধাপ ৩:</b> JavaScript চলে — প্রতিটি মডিউল <code class="inline">data-mount</code> নামের একটা চিহ্ন খুঁজে সেই জায়গায় <code class="inline">data.js</code>-এর ডেটা দিয়ে কনটেন্ট বসিয়ে দেয়। <b>ধাপ ৪:</b> ইউজার ক্লিক/ফিল্টার/সেভ করলে JavaScript পেজ আপডেট করে আর অবস্থা (state) <code class="inline">localStorage</code>-এ লিখে রাখে। <b>ধাপ ৫:</b> পরে আবার এলে সেভ করা ডেটা ফিরে পাওয়া যায় — তাই রিফ্রেশ করলেও বুকমার্ক আর প্রোগ্রেস হারায় না।</p>
+    </div>
+    <pre class="code">&lt;!-- HTML: an empty mount point --&gt;
+&lt;div data-mount="research"&gt;&lt;/div&gt;
+
+// JavaScript: the module fills it with cards made from data.js
+document.querySelectorAll('[data-mount="research"]').forEach(renderExplorer);</pre>
+    <p class="code-cap"><b>FIG:</b> how a section receives content — HTML declares <i>where</i>, JS decides <i>what</i>.</p>
+  </section>
+
+  <!-- ==================== 5. NAVIGATION ==================== -->
+  <section class="doc-sec" id="s5">
+    <h2><span lang="en">5. Sticky navigation + mobile drawer</span><span class="bn-h" lang="bn">৫. স্টিকি নেভিগেশন ও মোবাইল মেনু</span></h2>
+    <div class="lang-block" lang="en">
+      <p>The navbar is <b>sticky</b> (always visible at the top) and <b>responsive</b>: on desktop all 6 links show; below 1080px the links move into a right-side drawer that opens with a hamburger button. Clicking a link closes the drawer, clicking the dark area (scrim) closes it, and every nav item actually navigates.</p>
+      <p><b>A real bug I fixed here:</b> at first the mobile drawer appeared as a thin sliver. The reason: the navbar used <code class="inline">backdrop-filter: blur()</code>, and any element with a filter becomes the positioning reference for its <code class="inline">position: fixed</code> children — so the drawer's "fixed" coordinates were measured against the 72px navbar instead of the whole screen. Fix: move the blur to a <code class="inline">::before</code> pseudo-element so the drawer stays fixed to the viewport.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>নেভবারটি <b>স্টিকি</b> (সবসময় উপরে থাকে) এবং <b>রেসপনসিভ</b>: ডেস্কটপে ৬টি লিংক দেখা যায়, আর ১০৮০px-এর নিচে লিংকগুলো চলে যায় ডান পাশের ড্রয়ারে, যা হ্যামবার্গার বাটনে খোলে। লিংকে ক্লিক করলে মেনু বন্ধ হয়, বাইরের কালো আবরণে (scrim) ক্লিক করলেও বন্ধ হয়।</p>
+      <p><b>এখানে একটা আসল বাগ ঠিক করেছি:</b> শুরুতে মোবাইল মেনুটা দেখা যাচ্ছিল শুধু একটা চিকন অংশ হয়ে। কারণটা ছিল — নেভবারে <code class="inline">backdrop-filter: blur()</code> ছিল, আর CSS-এর নিয়ম অনুযায়ী filter থাকা কোনো এলিমেন্ট তার <code class="inline">position: fixed</code> সন্তানের অবস্থান নির্ণয়ের রেফারেন্স হয়ে যায়। ফলে মেনুটা পুরো স্ক্রিনের বদলে ৭২px-এর নেভবারের সাপেক্ষে বসছিল। সমাধান: blur-টা <code class="inline">::before</code> pseudo-element-এ সরিয়ে নিই।</p>
+    </div>
+    <pre class="code">/* Wrong: blur on .navbar breaks the fixed drawer inside it */
+/* Right: blur on a pseudo-element, so children keep viewport-fixed */
+.navbar::before {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  backdrop-filter: blur(14px);
+}</pre>
+    <p class="code-cap"><b>FIX:</b> <b>bug</b> → hamburger menu was invisible on mobile; <b>cause</b> → CSS containing-block rule; <b>lesson</b> → filters/transforms change how <code class="inline">position: fixed</code> works.</p>
+  </section>
+
+  <!-- ==================== 6. RESEARCH NETWORK ==================== -->
+  <section class="doc-sec" id="s6">
+    <h2><span lang="en">6. Hero section + interactive "Research Network"</span><span class="bn-h" lang="bn">৬. হিরো অংশ ও ইন্টার‍্যাক্টিভ "রিসার্চ নেটওয়ার্ক"</span></h2>
+    <div class="lang-block" lang="en">
+      <p>The hero shows the headline <b>"Your Bridge to Better Research."</b> with two buttons that smooth-scroll to sections. On the right sits the highlight: a <b>"FIG. 01 — The Research Network"</b> card — 8 circular nodes (Idea, Gap, Method, Experiment, Supervisor, Thesis, Paper, Journal) connected by lines, drawn with <b>SVG</b>.</p>
+      <p>Three things make it alive: <b>(a)</b> small dots (pulses) travel along the edges, <b>(b)</b> nodes can be <b>dragged</b> with mouse or finger and spring back with physics, <b>(c)</b> <b>tapping a node</b> shows a guidance panel with a tip and a link — and the whole graph slides up so no node hides behind the panel.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>হিরো অংশে আছে মূল শিরোনাম <b>"Your Bridge to Better Research."</b> আর দুটি বাটন, যেগুলো মসৃণভাবে নিচের সেকশনে স্ক্রল করে। ডান পাশে থাকে বিশেষ অংশটি: <b>"FIG. 01 — The Research Network"</b> কার্ড — ৮টি গোল নোড (Idea, Gap, Method, Experiment, Supervisor, Thesis, Paper, Journal) লাইন দিয়ে যুক্ত, <b>SVG</b> দিয়ে আঁকা।</p>
+      <p>এটাকে জীবন্ত করে তিনটি জিনিস: <b>(ক)</b> ছোট ছোট বিন্দু (pulse) লাইন ধরে চলাচল করে, <b>(খ)</b> নোডগুলো মাউস বা আঙুল দিয়ে <b>টেনে সরানো যায়</b>, ছেড়ে দিলে ফিজিক্স ব্যবহার করে নিজের জায়গায় ফিরে আসে, <b>(গ)</b> কোনো নোডে <b>ট্যাপ করলে</b> নিচে একটি প্যানেলে পরামর্শ ও লিংক দেখায় — আর পুরো গ্রাফ উপরে উঠে যায়, তাই কোনো নোড প্যানেলের আড়ালে লুকায় না।</p>
+    </div>
+    <pre class="code">// Spring physics: every frame, pull the node toward its anchor
+n.vx = (n.vx + (anchor.x - n.x) * 0.016) * 0.90; // 0.016 pull, 0.90 damping
+n.x += n.vx;</pre>
+    <p class="code-cap"><b>FIG:</b> the whole "physics engine" is two lines — force toward target, then damping. Higher pull = snappier, higher damping = less bounce.</p>
+    <div class="lang-block" lang="en">
+      <p><b>A real bug I fixed here:</b> on mobile the graph collapsed to zero width. Cause: in a one-column CSS grid, <code class="inline">margin: 0 auto</code> on an item changes it from "stretch" to "shrink-to-fit" — and since the graph's children were absolutely positioned, its content width was 0. Fix: use <code class="inline">width: 100%; justify-self: center;</code> instead of auto margins.</p>
+      <p><b>Another fix:</b> the guidance panel covered the bottom nodes. Fix: the panel's measured height becomes a <code class="inline">bottomInset</code>, and all node anchors re-compute within the remaining space — so the graph reflows above the panel.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p><b>এখানেও একটা বাগ ঠিক করেছি:</b> মোবাইলে গ্রাফটা শূন্য প্রস্থে সংকুচিত হয়ে যাচ্ছিল। কারণ: এক-কলামের CSS grid-এ কোনো আইটেমে <code class="inline">margin: 0 auto</code> দিলে সেটা "stretch" থেকে "content অনুযায়ী ছোট" হয়ে যায় — আর গ্রাফের ভেতরের সব এলিমেন্ট absolute ছিল, তাই content-এর প্রস্থই ছিল শূন্য! সমাধান: auto margin-এর বদলে <code class="inline">width: 100%; justify-self: center;</code>।</p>
+      <p><b>আরেকটি ফিক্স:</b> পরামর্শের প্যানেলটা নিচের নোডগুলোর উপর বসে যাচ্ছিল। সমাধান: প্যানেলের উচ্চতা মেপে সেটা <code class="inline">bottomInset</code> হিসেবে যোগ করা হয়, আর সব নোডের অবস্থান বাকি জায়গার ভেতরে নতুন করে হিসাব হয় — তাই গ্রাফ প্যানেলের উপরে সরে যায়।</p>
+    </div>
+  </section>
+
+  <!-- ==================== 7. STATISTICS ==================== -->
+  <section class="doc-sec" id="s7">
+    <h2><span lang="en">7. Animated statistics counters</span><span class="bn-h" lang="bn">৭. অ্যানিমেটেড পরিসংখ্যান</span></h2>
+    <div class="lang-block" lang="en">
+      <p>The home page shows 500+ Ideas, 100+ Topics, 50+ Areas, 1 Hub. The numbers <b>count up from 0</b>, but only <b>when the section becomes visible</b> — using an <code class="inline">IntersectionObserver</code>, which tells JavaScript "this element entered the screen". The count-up uses <code class="inline">requestAnimationFrame</code> with an easing curve so it slows down smoothly at the end.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>হোম পেজে ৫০০+ আইডিয়া, ১০০+ টপিক, ৫০+ এরিয়া, ১ হাব দেখানো হয়। সংখ্যাগুলো <b>০ থেকে গুনে বাড়তে থাকে</b>, কিন্তু শুরু হয় শুধু <b>যখন সেকশনটা স্ক্রিনে দেখা যায়</b> — এর জন্য <code class="inline">IntersectionObserver</code> ব্যবহার করা হয়েছে, যা JavaScript-কে বলে দেয় "এই এলিমেন্টটা এখন স্ক্রিনে ঢুকেছে"। গুনতে গুনতে শেষে সংখ্যা মসৃণভাবে থেমে যায় (easing)।</p>
+    </div>
+    <pre class="code">const io = new IntersectionObserver(entries =&gt; {
+  entries.forEach(en =&gt; { if (en.isIntersecting) animate(en.target); });
+}, { threshold: 0.4 });                       // 40% visible → start
+document.querySelectorAll('.stat-num').forEach(n =&gt; io.observe(n));</pre>
+    <p class="code-cap"><b>FIG:</b> trigger-on-visible pattern — the same observer technique also powers the scroll-reveal animation on cards.</p>
+  </section>
+
+  <!-- ==================== 8. EXPLORER ==================== -->
+  <section class="doc-sec" id="s8">
+    <h2><span lang="en">8. Research Idea Explorer — search, combined filters, sorting</span><span class="bn-h" lang="bn">৮. রিসার্চ আইডিয়া এক্সপ্লোরার — সার্চ, ফিল্টার, সর্টিং</span></h2>
+    <div class="lang-block" lang="en">
+      <p>This is the heart of the site. The user can <b>search</b> (matches title, description, category, technology and tags while typing) and apply <b>four filters at once</b> — category, difficulty, research type, technology. Filters combine with AND logic: "AI + Intermediate + Python" shows only ideas matching all three. A dropdown sorts results 5 ways. If nothing matches, a friendly empty state appears with a "Clear Filters" button.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>এটাই সাইটের প্রাণ। ইউজার টাইপ করার সাথে সাথে <b>সার্চ</b> করতে পারে (টাইটেল, বর্ণনা, ক্যাটাগরি, টেকনোলজি, ট্যাগ — সব মিলিয়ে), আর একসাথে <b>চারটি ফিল্টার</b> ব্যবহার করতে পারে — ক্যাটাগরি, ডিফিকাল্টি, রিসার্চ টাইপ, টেকনোলজি। ফিল্টারগুলো AND লজিকে কাজ করে: "AI + Intermediate + Python" সিলেক্ট করলে শুধু তিনটার সবগুলোর সাথে মিলে যাওয়া আইডিয়া দেখায়। ড্রপডাউন থেকে ৫ রকম সাজানো যায়। কিছুই না মিললে বন্ধুত্বপূর্ণ একটা empty state দেখায়, "Clear Filters" বাটনসহ।</p>
+    </div>
+    <pre class="code">// The combined filter: a card must pass EVERY condition (AND logic)
+let list = TB_DATA.researchIdeas.filter(function (r) {
+  const hay = (r.title + r.description + r.category +
+               r.technologies.join(' ') + r.tags.join(' ')).toLowerCase();
+  if (q &amp;&amp; hay.indexOf(q) === -1)            return false; // 1. search text
+  if (state.cats.length &amp;&amp; !state.cats.includes(r.category)) return false; // 2. category
+  if (state.diff !== 'All' &amp;&amp; r.difficulty !== state.diff)   return false; // 3. difficulty
+  if (!r.technologies.some(t =&gt; state.techs.includes(t)))    return false; // 4. technology
+  return true;                                              // passed all → keep
+});</pre>
+    <p class="code-cap"><b>FIG:</b> the real filter function (simplified). <code class="inline">filter()</code> keeps only items where the function returns <code class="inline">true</code> — this is the JavaScript <code class="inline">Array.filter()</code> method doing all the work.</p>
+  </section>
+
+  <!-- ==================== 9. DETAILS + BOOKMARKS ==================== -->
+  <section class="doc-sec" id="s9">
+    <h2><span lang="en">9. Idea detail modal + bookmark system</span><span class="bn-h" lang="bn">৯. আইডিয়ার বিস্তারিত মডাল ও বুকমার্ক</span></h2>
+    <div class="lang-block" lang="en">
+      <p>Every idea card has <b>View Details</b>, which opens a modal showing the full research brief: problem, research gap, suggested methodology, expected outcome, technologies, keywords and potential supervisors. Each card also has a <b>bookmark icon</b>. Bookmarks are stored as an array of idea IDs in localStorage, and a small badge on the navbar shows the live count. A "Saved Ideas" panel lists them with remove/view actions.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>প্রতিটি আইডিয়া কার্ডে <b>View Details</b> বাটন আছে, যেটাতে মডাল খুলে পুরো রিসার্চ ব্রিফ দেখায়: সমস্যা, রিসার্চ গ্যাপ, প্রস্তাবিত পদ্ধতি, প্রত্যাশিত ফলাফল, টেকনোলজি, কীওয়ার্ড ও সম্ভাব্য সুপারভাইজার। প্রতিটি কার্ডে <b>বুকমার্ক আইকন</b> আছে। বুকমার্কগুলো localStorage-এ শুধু আইডিয়ার ID-র একটা array হিসেবে সেভ হয়, আর নেভবারে একটা ছোট ব্যাজে সংখ্যা দেখায়। "Saved Ideas" প্যানেলে সব সেভ করা আইডিয়া একত্রে দেখা ও বাদ দেওয়া যায়।</p>
+    </div>
+    <pre class="code">TB.toggleBookmark = function (id) {
+  const ids = TB.state.get('tb_bookmarks', []);  // read saved array
+  const i = ids.indexOf(id);
+  if (i &gt; -1) { ids.splice(i, 1); TB.toast('Research idea removed.'); }
+  else        { ids.push(id);    TB.toast('Research idea saved.');   }
+  TB.state.set('tb_bookmarks', ids);             // write back
+};</pre>
+    <p class="code-cap"><b>FIG:</b> toggle pattern — read → modify → write. The same three lines power both "save" and "remove".</p>
+  </section>
+
+  <!-- ==================== 10. SUPERVISOR MATCHING ==================== -->
+  <section class="doc-sec" id="s10">
+    <h2><span lang="en">10. Supervisor matching — profiles, filters and the demo algorithm</span><span class="bn-h" lang="bn">১০. সুপারভাইজার ম্যাচিং — প্রোফাইল, ফিল্টার ও ডেমো অ্যালগরিদম</span></h2>
+    <div class="lang-block" lang="en">
+      <p>12 fictional but realistic supervisor profiles can be filtered by university, department, research area and expertise — all combinable. Each profile modal shows publications, supervision areas and suggested thesis topics. The special part is the <b>4-step questionnaire</b>: research area → technologies you know → preferred type → preferred difficulty. A scoring function then ranks every supervisor with a percentage, shown with a disclaimer that it is a demo.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>১২টি বাস্তবসম্মত সুপারভাইজার প্রোফাইল বিশ্ববিদ্যালয়, বিভাগ, রিসার্চ এরিয়া ও এক্সপার্টিজ দিয়ে ফিল্টার করা যায় — সবগুলো একসাথেও চলে। প্রোফাইল মডালে পাবলিকেশন, সুপারভিশন এরিয়া ও প্রস্তাবিত থিসিস টপিক থাকে। বিশেষ অংশ হলো <b>৪-ধাপের কুইজ</b>: রিসার্চ এরিয়া → জানা টেকনোলজি → পছন্দের টাইপ → পছন্দের ডিফিকাল্টি। এরপর একটি স্কোরিং ফাংশন প্রতিটি সুপারভাইজারকে শতকরা হারে সাজায়, আর "এটি ডেমো" — লেখা স্পষ্ট থাকে।</p>
+    </div>
+    <pre class="code">function matchScore(sup, ans) {              // sup = supervisor, ans = answers
+  let score = 0;
+  if (sup.areas.includes(ans.area)) score += 45;              // 45% weight: area
+  const hits = ans.techs.filter(t =&gt; sup.expertise.includes(t)).length;
+  score += (hits / ans.techs.length) * 25;                    // 25% weight: tools
+  if (sup.supervisionTypes.includes(ans.type)) score += 15;   // 15% weight: type
+  score += 10;                                                // 10%: difficulty fit
+  return Math.min(99, Math.round(score));                     // e.g. → "94% Match"
+}</pre>
+    <p class="code-cap"><b>FIG:</b> the matching algorithm — a <b>weighted score</b> out of 100. Weights were chosen by importance: the right research area matters most (45), tools next (25), then type (15), difficulty (10).</p>
+  </section>
+
+  <!-- ==================== 11. ROADMAP ==================== -->
+  <section class="doc-sec" id="s11">
+    <h2><span lang="en">11. Research roadmap — clickable timeline with progress</span><span class="bn-h" lang="bn">১১. রিসার্চ রোডম্যাপ — ক্লিকযোগ্য টাইমলাইন ও প্রোগ্রেস</span></h2>
+    <div class="lang-block" lang="en">
+      <p>Eight steps from "Choose Research Area" to "Submit to Journal". Each step opens a panel with an explanation, recommended actions and resources. <b>Mark as Complete</b> saves the step, fills the circles green, advances a gradient line, and updates the header: <b>"Research Journey: 37% Complete"</b> — recalculated live from the saved array.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>"Choose Research Area" থেকে "Submit to Journal" পর্যন্ত ৮টি ধাপ। প্রতিটি ধাপে ক্লিক করলে একটি প্যানেল খোলে — ব্যাখ্যা, করণীয় এবং রিসোর্সসহ। <b>Mark as Complete</b> চাপলে ধাপটি সেভ হয়, বৃত্ত সবুজ হয়, একটি গ্রেডিয়েন্ট লাইন এগিয়ে যায়, আর উপরের হেডারে লাইভ হিসাবে দেখায়: <b>"Research Journey: 37% Complete"</b>।</p>
+    </div>
+    <pre class="code">const done = TB.state.get('tb_roadmap', []);        // e.g. [1, 2, 3]
+const pct  = Math.round((done.length / steps.length) * 100);   // 3/8 → 38%
+document.querySelector('.progress-fill').style.width = pct + '%';</pre>
+    <p class="code-cap"><b>FIG:</b> progress = completed ÷ total × 100. The same formula drives the journal checklist below.</p>
+  </section>
+
+  <!-- ==================== 12. PUBLICATION ==================== -->
+  <section class="doc-sec" id="s12">
+    <h2><span lang="en">12. Publication Hub + interactive journal checklist</span><span class="bn-h" lang="bn">১২. পাবলিকেশন হাব ও ইন্টার‍্যাক্টিভ চেকলিস্ট</span></h2>
+    <div class="lang-block" lang="en">
+      <p>Seven guides (Journal Selection, Paper Formatting, Citation, Plagiarism, Peer Review, Submission, Ethics) open as modals, and opened guides get a green "Read" badge so the student can track coverage. The <b>Journal Checklist</b> has 8 checkboxes with a live progress bar — e.g. ticking 5 items shows <b>"5 / 8 Completed — 62%"</b>. State is saved automatically.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>সাতটি গাইড (Journal Selection, Paper Formatting, Citation, Plagiarism, Peer Review, Submission, Ethics) মডাল হিসেবে খোলে, আর পড়া গাইডে সবুজ "Read" ব্যাজ বসে যায় — ফলে কোনটা কভার হয়েছে বোঝা যায়। <b>Journal Checklist</b>-এ ৮টি চেকবক্স ও লাইভ প্রোগ্রেস বার আছে — ৫টি টিক দিলে দেখায় <b>"5 / 8 Completed — 62%"</b>। অবস্থা নিজে থেকেই সেভ হয়।</p>
+    </div>
+    <pre class="code">&lt;label class="cl-item"&gt;
+  &lt;input type="checkbox"&gt;
+  &lt;span class="cl-box"&gt;&lt;i class="fa-solid fa-check"&gt;&lt;/i&gt;&lt;/span&gt;   &lt;!-- custom box --&gt;
+  &lt;span class="cl-text"&gt;Manuscript formatted&lt;/span&gt;
+&lt;/label&gt;</pre>
+    <p class="code-cap"><b>FIG:</b> custom checkbox trick — the real input is invisible; the styled span next to it changes when <code class="inline">input:checked ~ .cl-box</code> (the <code class="inline">~</code> selector targets a later sibling).</p>
+  </section>
+
+  <!-- ==================== 13. RESOURCES ==================== -->
+  <section class="doc-sec" id="s13">
+    <h2><span lang="en">13. Resource library</span><span class="bn-h" lang="bn">১৩. রিসোর্স লাইব্রেরি</span></h2>
+    <div class="lang-block" lang="en">
+      <p>20 resources across 9 categories (Methodology, Literature Review, Research Gap, Writing, Citation, Statistics, Dataset, Tools, AI for Research) with live search + category chips. Cards marked "Tool/Dataset" (Zotero, Kaggle, Overleaf…) open real external links; guides open detail modals. Same empty-state pattern as the explorer.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>৯টি ক্যাটাগরিতে ২০টি রিসোর্স (Methodology, Literature Review, Research Gap, Writing, Citation, Statistics, Dataset, Tools, AI for Research) — লাইভ সার্চ ও ক্যাটাগরি চিপসহ। "Tool/Dataset" কার্ডগুলো (Zotero, Kaggle, Overleaf…) আসল বাইরের লিংক খোলে; গাইডগুলো বিস্তারিত মডালে খোলে।</p>
+    </div>
+  </section>
+
+  <!-- ==================== 14. FAQ ==================== -->
+  <section class="doc-sec" id="s14">
+    <h2><span lang="en">14. FAQ accordion — only one open at a time</span><span class="bn-h" lang="bn">১৪. FAQ অ্যাকর্ডিয়ন — একবারে একটাই খোলে</span></h2>
+    <div class="lang-block" lang="en">
+      <p>8 questions in an accordion. The animation has no JavaScript height math at all — pure CSS <code class="inline">grid-template-rows: 0fr → 1fr</code> transition. JavaScript's only job is to close the previously open item before opening the clicked one.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>৮টি প্রশ্ন অ্যাকর্ডিয়নে আছে। অ্যানিমেশনের জন্য কোনো JavaScript উচ্চতার হিসাবই লাগে না — বিশুদ্ধ CSS: <code class="inline">grid-template-rows: 0fr → 1fr</code> ট্রানজিশন। JavaScript শুধু নতুনটা খোলার আগে আগেরটা বন্ধ করে।</p>
+    </div>
+    <pre class="code">.faq-a            { display: grid; grid-template-rows: 0fr; transition: .32s; }
+.faq-item.open .faq-a { grid-template-rows: 1fr; }   /* 0fr → 1fr = smooth open */
+.faq-a-inner      { overflow: hidden; }              /* hides content while 0fr */</pre>
+    <p class="code-cap"><b>FIG:</b> the modern CSS-only accordion animation (grid rows trick) — smoother and simpler than animating <code class="inline">height</code>.</p>
+  </section>
+
+  <!-- ==================== 15. AUTH ==================== -->
+  <section class="doc-sec" id="s15">
+    <h2><span lang="en">15. Login &amp; sign-up — JavaScript validation</span><span class="bn-h" lang="bn">১৫. লগইন ও সাইন-আপ — JavaScript ভ্যালিডেশন</span></h2>
+    <div class="lang-block" lang="en">
+      <p>Both forms validate before "submitting": required fields, email format (regular expression), minimum password length, and matching passwords. Errors appear in red under each field. Since there is no backend, success shows <b>"Demo login successful."</b> and the profile is stored locally. The navbar then greets the user by name with their initials as an avatar.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>দুটো ফর্মই জমা দেওয়ার আগে যাচাই করে: ঘর পূরণ হয়েছে কি না, ইমেইল ঠিক আছে কি না (regular expression দিয়ে), পাসওয়ার্ডের দৈর্ঘ্য, আর দুটো পাসওয়ার্ড মিলছে কি না। ভুল হলে প্রতিটি ঘরের নিচে লাল ত্রুটিবার্তা দেখায়। ব্যাকএন্ড নেই বলে সফল হলে <b>"Demo login successful."</b> দেখায় আর প্রোফাইল লোকালিতে সেভ হয়। এরপর নেভবারে নামের আদ্যক্ষর দিয়ে অ্যাভাটারসহ শুভেচ্ছা দেখায়।</p>
+    </div>
+    <pre class="code">const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;   // text @ text . text
+if (!EMAIL_RE.test(email.value.trim()))
+    fieldError(email, 'Please enter a valid email address.');
+if (password.value.length &lt; 8)
+    fieldError(password, 'Password must be at least 8 characters.');
+if (password2.value !== password.value)
+    fieldError(password2, 'Passwords do not match.');</pre>
+    <p class="code-cap"><b>FIG:</b> real validation rules. The regex reads: "no spaces, then @, then text, then a dot, then more text."</p>
+  </section>
+
+  <!-- ==================== 16. DARK MODE ==================== -->
+  <section class="doc-sec" id="s16">
+    <h2><span lang="en">16. Dark mode with CSS variables</span><span class="bn-h" lang="bn">১৬. CSS variables দিয়ে ডার্ক মোড</span></h2>
+    <div class="lang-block" lang="en">
+      <p>Every color in the site is a CSS variable. Dark mode is just a different set of values applied when <code class="inline">&lt;html data-theme="dark"&gt;</code>. One toggle button changes one attribute — the entire site (200+ rules) follows instantly, and the choice is saved so it survives refresh. There is also no flash of wrong theme on load, because a tiny script sets the theme before CSS painting.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>সাইটের প্রতিটি রঙ একটি CSS variable। ডার্ক মোড মানে শুধু <code class="inline">&lt;html data-theme="dark"&gt;</code> থাকলে ভিন্ন মানের সেট প্রয়োগ হওয়া। একটি টগল বাটন একটি attribute বদলায় — গোটা সাইট সঙ্গে সঙ্গে বদলে যায়, আর পছন্দটা সেভ হয়ে থাকে। পেজ খোলার সময় ভুল থিমের ঝলকও দেখা যায় না, কারণ CSS আঁকার আগেই একটি ছোট স্ক্রিপ্ট থিম ঠিক করে দেয়।</p>
+    </div>
+    <pre class="code">:root              { --bg: #f5f8f6; --text: #15221d; }   /* light values */
+[data-theme='dark']{ --bg: #0c1512; --text: #e7f0ea; }   /* dark values  */
+
+button.onclick = () =&gt; {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;   // one attribute → whole site
+  localStorage.setItem('tb_theme', JSON.stringify(next));
+};</pre>
+    <p class="code-cap"><b>FIG:</b> theming = variables + one attribute. No duplicated dark CSS — every component reads the same variables.</p>
+  </section>
+
+  <!-- ==================== 17. TOASTS + MODALS ==================== -->
+  <section class="doc-sec" id="s17">
+    <h2><span lang="en">17. Toast notifications + one reusable modal system</span><span class="bn-h" lang="bn">১৭. টোস্ট নোটিফিকেশন ও পুনর্ব্যবহারযোগ্য মডাল সিস্টেম</span></h2>
+    <div class="lang-block" lang="en">
+      <p><b>Toasts</b> are the small messages that slide in (idea saved, step completed, filters cleared…) and auto-dismiss after ~3.4 seconds. <b>Every</b> dialog on the site — idea details, supervisor profile, guides, resources, login, sign-up, saved panels — uses <b>one shared modal function</b>. It handles: opening animation, closing by X, clicking outside, the Escape key, stacked modals (a modal opened from a modal), focus return and scroll locking.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p><b>টোস্ট</b> হলো পাশ থেকে ভেসে আসা ছোট বার্তা (আইডিয়া সেভ হয়েছে, ধাপ সম্পন্ন হয়েছে…) — প্রায় ৩.৪ সেকেন্ড পর নিজে থেকেই মিলিয়ে যায়। সাইটের <b>সবগুলো</b> ডায়ালগ — আইডিয়ার বিস্তারিত, সুপারভাইজার প্রোফাইল, গাইড, রিসোর্স, লগইন, সাইন-আপ, সেভড প্যানেল — <b>একটি শেয়ার্ড মডাল ফাংশন</b> ব্যবহার করে। এটি নিজেই সামলায়: খোলার অ্যানিমেশন, X দিয়ে বন্ধ, বাইরে ক্লিকে বন্ধ, Escape কী, মডালের ভেতরে আরেকটা মডাল, ফোকাস ফেরত ও স্ক্রল লক।</p>
+    </div>
+    <pre class="code">// One function opens every dialog on the site:
+TB.modal.open({ title: 'Saved Ideas', body: '...', footer: '...', size: 'lg' });
+
+// Escape closes the topmost open modal:
+document.addEventListener('keydown', e =&gt; {
+  if (e.key === 'Escape' &amp;&amp; stack.length) stack[stack.length - 1].close();
+});</pre>
+    <p class="code-cap"><b>FIG:</b> write-once, use-everywhere — 8 different dialogs share ~60 lines of modal code instead of 8 copies.</p>
+  </section>
+
+  <!-- ==================== 18. RESPONSIVE ==================== -->
+  <section class="doc-sec" id="s18">
+    <h2><span lang="en">18. Responsive design — tested at real phone sizes</span><span class="bn-h" lang="bn">১৮. রেসপনসিভ ডিজাইন — আসল মোবাইল সাইজে পরীক্ষিত</span></h2>
+    <div class="lang-block" lang="en">
+      <p>Tested at 320, 375, 768, 1024 and 1440 px in a real browser (not just resized). Mobile gets: hamburger drawer, single-column cards, collapsible filter panels, full-width touch-friendly buttons (44px minimum), and zero horizontal scrolling — verified by measuring <code class="inline">scrollWidth</code> on every page. Desktop gets a multi-column grid via <code class="inline">auto-fill</code>.</p>
+      <p><b>Two real bugs found by testing and fixed:</b> (1) the drawer clipping bug explained in section 5; (2) the zero-width graph bug in section 6. Both were found by opening the site at phone width, measuring element rectangles with JavaScript, and reading why the layout collapsed — exactly the debugging process worth demonstrating.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>আসল ব্রাউজারে ৩২০, ৩৭৫, ৭৬৮, ১০২৪ ও ১৪৪০ px-এ পরীক্ষা করা হয়েছে (শুধু উইন্ডো ছোট করে না)। মোবাইলে পাওয়া যায়: হ্যামবার্গার মেনু, এক-কলাম কার্ড, ভাঁজ হওয়া ফিল্টার প্যানেল, পুরো প্রস্থের বাটন (সর্বনিম্ন ৪৪px — আঙুলে চাপার উপযোগী), এবং কোনো পেজেই পাশে স্ক্রল হয় না — প্রতিটি পেজে <code class="inline">scrollWidth</code> মেপে যাচাই করা।</p>
+      <p><b>টেস্ট করতে গিয়ে পাওয়া দুটি আসল বাগ, যা ঠিক করা হয়েছে:</b> (১) সেকশন ৫-এর ড্রয়ার ক্লিপিং বাগ; (২) সেকশন ৬-এর শূন্য-প্রস্থ গ্রাফ বাগ। দুটোই ধরা হয়েছে মোবাইল প্রস্থে সাইট খুলে, JavaScript দিয়ে এলিমেন্টের মাপ জেনে — এটাই আসল ডিবাগিং প্রক্রিয়া।</p>
+    </div>
+    <pre class="code">.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); /* ← magic line */
+}
+/* 1440px screen → 3–4 columns.  375px phone → 1 column.  Same CSS. */</pre>
+    <p class="code-cap"><b>FIG:</b> one line of grid CSS gives responsive columns at every screen size — no media query needed for the cards themselves.</p>
+  </section>
+
+  <!-- ==================== 19. DATA ARCHITECTURE ==================== -->
+  <section class="doc-sec" id="s19">
+    <h2><span lang="en">19. Data architecture — ready for a real backend</span><span class="bn-h" lang="bn">১৯. ডেটা আর্কিটেকচার — ভবিষ্যতের ব্যাকএন্ডের জন্য প্রস্তুত</span></h2>
+    <div class="lang-block" lang="en">
+      <p>All content lives in <code class="inline">js/data.js</code> as plain arrays of objects — one sample idea looks like this. All user state goes through a single wrapper, <code class="inline">TB.state</code>. Because <b>every</b> feature reads data through these two doors only, connecting a real database later means changing 2 files, not 20.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>সব কনটেন্ট <code class="inline">js/data.js</code>-এ সাধারণ object-এর array হিসেবে আছে — একটি নমুনা আইডিয়া দেখতে এমন। আর সব ইউজার-স্টেট যায় একটি মাত্র জায়গা দিয়ে — <code class="inline">TB.state</code>। যেহেতু <b>প্রতিটি</b> ফিচার ডেটা পড়ে শুধু এই দুই দরজা দিয়ে, পরে আসল ডেটাবেস জোড়া লাগাতে ২টি ফাইল বদলালেই হবে, ২০টা না।</p>
+    </div>
+    <pre class="code">// js/data.js — one research idea (simplified real entry)
+{
+  id: 1,
+  title: "Explainable AI for Medical Diagnosis",
+  category: "Artificial Intelligence",
+  difficulty: "Intermediate",
+  technologies: ["Python", "PyTorch"],
+  type: "Thesis",
+  problem: "Deep learning models act as black boxes…",
+  gap: "Explanation faithfulness is untested on local datasets…",
+  methodology: "Train a CNN, apply SHAP/LIME, survey clinicians…",
+  outcome: "An interpretable prototype + comparison report",
+  keywords: ["XAI", "SHAP", "LIME"]
+}
+
+// The single "door" for saved user data (js/main.js)
+TB.state = {
+  get(key, def) { try { const v = localStorage.getItem(key);
+                        return v === null ? def : JSON.parse(v); } catch(e){ return def; } },
+  set(key, val) { localStorage.setItem(key, JSON.stringify(val));
+                  document.dispatchEvent(new CustomEvent('tb:change', { detail: { key } })); }
+};</pre>
+    <p class="code-cap"><b>FIG:</b> the two swap points. Future backend version: <code class="inline">data.js</code> → <code class="inline">fetch('/api/ideas')</code>, and <code class="inline">TB.state</code> → API calls. UI code untouched.</p>
+    <div class="lang-block" lang="en">
+      <h3 class="mini">Feature → file → function map (for quick reference)</h3>
+      <table class="map">
+        <tr><th>Feature</th><th>File</th><th>Key function / section</th></tr>
+        <tr><td>Idea search + filters + sort</td><td><code>research.js</code></td><td><code>results()</code>, <code>renderGrid()</code></td></tr>
+        <tr><td>Supervisor matching quiz</td><td><code>supervisors.js</code></td><td><code>matchScore()</code>, <code>openMatchQuiz()</code></td></tr>
+        <tr><td>Roadmap + progress %</td><td><code>publication.js</code></td><td><code>renderRoadmap()</code></td></tr>
+        <tr><td>Journal checklist</td><td><code>publication.js</code></td><td><code>renderChecklist()</code></td></tr>
+        <tr><td>Resource library</td><td><code>resources.js</code></td><td><code>renderLibrary()</code></td></tr>
+        <tr><td>Modal system, toasts, theme, auth</td><td><code>main.js</code></td><td><code>TB.modal</code>, <code>TB.toast()</code>, <code>TB.state</code></td></tr>
+        <tr><td>Network figure (physics)</td><td><code>network.js</code></td><td><code>physics()</code>, <code>render()</code></td></tr>
+      </table>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p class="table-note">উপরের টেবিলে প্রতিটি ফিচার কোন ফাইলের কোন ফাংশনে আছে — ভাইভার সময় দ্রুত দেখানোর জন্য।</p>
+    </div>
+  </section>
+
+  <!-- ==================== 20. HOW TO RUN ==================== -->
+  <section class="doc-sec" id="s20">
+    <h2><span lang="en">20. How to run</span><span class="bn-h" lang="bn">২০. কীভাবে চালানো যায়</span></h2>
+    <div class="lang-block" lang="en">
+      <p>Two ways. <b>Easy:</b> double-click <code class="inline">index.html</code>. <b>Recommended:</b> serve it with Python (comes with Windows/any OS) and open the local address — this matches how real sites are served:</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>দুইভাবে চালানো যায়। <b>সহজ:</b> <code class="inline">index.html</code> ডাবল-ক্লিক করুন। <b>প্রস্তাবিত:</b> Python দিয়ে লোকাল সার্ভার চালান (Python প্রায় সব কম্পিউটারে থাকে) — এতে আসল ওয়েবসাইটের মতোই চলবে:</p>
+    </div>
+    <pre class="code">cd thesisbridge-bd
+python -m http.server 8417
+# then open →  http://127.0.0.1:8417/index.html</pre>
+  </section>
+
+  <!-- ==================== 21. LIMITATIONS ==================== -->
+  <section class="doc-sec" id="s21">
+    <h2><span lang="en">21. Demo limitations &amp; future plan</span><span class="bn-h" lang="bn">২১. ডেমো সীমাবদ্ধতা ও ভবিষ্যৎ পরিকল্পনা</span></h2>
+    <div class="lang-block" lang="en">
+      <ul class="tight">
+        <li><b>Data is sample data</b> — ideas and supervisors are realistic but fictional; a real version needs verified faculty data.</li>
+        <li><b>No server</b> — saved data lives in one browser only; no sync between devices.</li>
+        <li><b>Auth is simulated</b> — no real accounts, password hashing or email verification.</li>
+        <li><b>Matching is a demo</b> — a weighted score based on user-selected interests, not an academic recommendation (labelled as such in the UI).</li>
+      </ul>
+      <p><b>Future plan:</b> Node/Express (or Django/Laravel) API + a database (MongoDB/PostgreSQL). Step 1: replace <code class="inline">data.js</code> with API calls. Step 2: replace <code class="inline">TB.state</code> with per-user API calls. Step 3: real authentication (bcrypt + JWT). Step 4: admin panel to manage content. The frontend will not need rewriting — this was the design goal.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <ul class="tight">
+        <li><b>ডেটা স্যাম্পল</b> — আইডিয়া ও সুপারভাইজাররা বাস্তবসম্মত কিন্তু কাল্পনিক; আসল সংস্করণে যাচাই করা ফ্যাকাল্টি ডেটা লাগবে।</li>
+        <li><b>সার্ভার নেই</b> — সেভ করা ডেটা শুধু একটি ব্রাউজারে থাকে; ডিভাইসে সিঙ্ক হয় না।</li>
+        <li><b>লগইন সিমুলেটেড</b> — আসল অ্যাকাউন্ট, পাসওয়ার্ড এনক্রিপশন বা ইমেইল ভেরিফিকেশন নেই।</li>
+        <li><b>ম্যাচিং ডেমো</b> — ইউজারের নির্বাচিত আগ্রহের ভিত্তিতে ওয়েটেড স্কোর; এটি কোনো একাডেমিক সুপারিশ নয় (ইন্টারফেসেও তা লেখা আছে)।</li>
+      </ul>
+      <p><b>ভবিষ্যৎ পরিকল্পনা:</b> Node/Express (বা Django/Laravel) API + ডেটাবেস (MongoDB/PostgreSQL)। ধাপ ১: <code class="inline">data.js</code>-এর বদলে API call। ধাপ ২: <code class="inline">TB.state</code>-এর বদলে ইউজারভিত্তিক API call। ধাপ ৩: আসল অথেনটিকেশন (bcrypt + JWT)। ধাপ ৪: কনটেন্ট ম্যানেজ করার অ্যাডমিন প্যানেল। ফ্রন্টএন্ড নতুন করে লিখতে হবে না — এটাই ডিজাইনের লক্ষ্য ছিল।</p>
+    </div>
+  </section>
+
+  <!-- ==================== 22. VIVA Q&A ==================== -->
+  <section class="doc-sec" id="s22">
+    <h2><span lang="en">22. Likely viva questions (with short answers)</span><span class="bn-h" lang="bn">২২. সম্ভাব্য ভাইভা প্রশ্ন ও উত্তর</span></h2>
+
+    <div class="qa"><div lang="en"><p class="q">Q: Why vanilla JavaScript instead of React?</p><p>A: The requirement was a framework-free prototype. It also demonstrates deeper understanding: every modal, filter and animation is hand-built, so I can explain any line. The architecture (data layer + state wrapper) keeps it backend-ready anyway.</p></div><div lang="bn"><p class="q">প্রশ্ন: React-এর বদলে vanilla JavaScript কেন?</p><p>উত্তর: প্রোটোটাইপে ফ্রেমওয়ার্ক-মুক্ত থাকার শর্ত ছিল। এতে বোঝাও যায় যে বেসিক ব্যাপারগুলো ভালোভাবে আয়ত্তে আছে — প্রতিটি মডাল, ফিল্টার, অ্যানিমেশন হাতে লেখা, তাই যেকোনো লাইন ব্যাখ্যা করতে পারব। আর ডেটা লেয়ার + স্টেট র‍্যাপার থাকায় পরে ব্যাকএন্ডের সাথে যুক্ত করাও সহজ।</p></div></div>
+
+    <div class="qa"><div lang="en"><p class="q">Q: Where is the data stored, since there is no database?</p><p>A: Content data (ideas, supervisors) is in <code class="inline">js/data.js</code> as JavaScript arrays. User data (bookmarks, progress, theme, profile) is in the browser's <code class="inline">localStorage</code> through a single <code class="inline">TB.state</code> wrapper — designed so it can be swapped for API calls.</p></div><div lang="bn"><p class="q">প্রশ্ন: ডেটাবেস না থাকলে ডেটা কোথায় থাকে?</p><p>উত্তর: কনটেন্টের ডেটা (আইডিয়া, সুপারভাইজার) আছে <code class="inline">js/data.js</code>-এ JavaScript array হিসেবে। ইউজারের ডেটা (বুকমার্ক, প্রোগ্রেস, থিম, প্রোফাইল) থাকে ব্রাউজারের <code class="inline">localStorage</code>-এ, একটি <code class="inline">TB.state</code> র‍্যাপারের ভেতর দিয়ে — যা পরে API call দিয়ে বদলানোর জন্যই বানানো।</p></div></div>
+
+    <div class="qa"><div lang="en"><p class="q">Q: How do the combined filters work?</p><p>A: AND logic. The list is passed through <code class="inline">Array.filter()</code> and a card survives only if it passes every active condition — search text, category, difficulty, type and technology (section 8 shows the code).</p></div><div lang="bn"><p class="q">প্রশ্ন: একাধিক ফিল্টার একসাথে কীভাবে কাজ করে?</p><p>উত্তর: AND লজিকে। তালিকাটা <code class="inline">Array.filter()</code>-এর ভেতর দিয়ে যায়, আর কোনো কার্ড থাকবে শুধু তখনই যখন সব চালু শর্তে পাস করে — সার্চ টেক্সট, ক্যাটাগরি, ডিফিকাল্টি, টাইপ ও টেকনোলজি (সেকশন ৮-এ কোড আছে)।</p></div></div>
+
+    <div class="qa"><div lang="en"><p class="q">Q: Is the supervisor matching real AI?</p><p>A: No — and the UI says so. It is a transparent weighted scoring function (area 45%, tools 25%, type 15%, difficulty 10%). A real version would rank supervisors from verified publication data on a server.</p></div><div lang="bn"><p class="q">প্রশ্ন: সুপারভাইজার ম্যাচিং কি আসল AI?</p><p>উত্তর: না — আর ইন্টারফেসে তাই লেখাও আছে। এটি একটি স্পষ্ট ওয়েটেড স্কোরিং ফাংশন (এরিয়া ৪৫%, টুলস ২৫%, টাইপ ১৫%, ডিফিকাল্টি ১০%)। আসল সংস্করণে সার্ভারে যাচাই করা পাবলিকেশন ডেটা থেকে র‍্যাংক করা হবে।</p></div></div>
+
+    <div class="qa"><div lang="en"><p class="q">Q: What was the hardest bug?</p><p>A: The mobile drawer that rendered as a sliver. <code class="inline">backdrop-filter</code> on the navbar made it the containing block for the <code class="inline">position: fixed</code> drawer, so the drawer's coordinates were relative to a 72px bar. Fixed by moving the blur to a pseudo-element. It taught me that filters/transforms change how fixed positioning works.</p></div><div lang="bn"><p class="q">প্রশ্ন: সবচেয়ে কঠিন বাগ কোনটা ছিল?</p><p>উত্তর: মোবাইলে মেনুটা চিকন অংশ হয়ে দেখাচ্ছিল। নেভবারের <code class="inline">backdrop-filter</code> তাকে <code class="inline">position: fixed</code> ড্রয়ারের containing block বানিয়ে ফেলেছিল, তাই ড্রয়ারের স্থানাঙ্ক পুরো স্ক্রিনের বদলে ৭২px বারের সাপেক্ষে হিসাব হচ্ছিল। blur-টা pseudo-element-এ সরিয়ে ঠিক করেছি। শিক্ষা: filter/transform থাকলে fixed positioning-এর আচরণ বদলে যায়।</p></div></div>
+
+    <div class="qa"><div lang="en"><p class="q">Q: How did you test responsiveness?</p><p>A: In a real browser at 320/375/768/1024/1440 px: opened every page, exercised every interactive element (menus, modals, quiz, forms), took screenshots, and programmatically measured <code class="inline">scrollWidth</code> vs viewport width on all 6 pages to prove there is no horizontal overflow.</p></div><div lang="bn"><p class="q">প্রশ্ন: রেসপনসিভনেস কীভাবে টেস্ট করেছ?</p><p>উত্তর: আসল ব্রাউজারে ৩২০/৩৭৫/৭৬৮/১০২৪/১৪৪০ px-এ: প্রতিটি পেজ খুলেছি, সব ইন্টার‍্যাক্টিভ জিনিস (মেনু, মডাল, কুইজ, ফর্ম) চালিয়েছি, স্ক্রিনশট নিয়েছি, এবং ৬টি পেজেই <code class="inline">scrollWidth</code> বনাম viewport width মেপে প্রমাণ করেছি পাশে কোনো স্ক্রল নেই।</p></div></div>
+
+    <div class="qa"><div lang="en"><p class="q">Q: How would you connect a real backend?</p><p>A: The system has exactly two data doors: <code class="inline">data.js</code> (content) and <code class="inline">TB.state</code> (user data). A backend version replaces those two with API calls — the UI modules never touch storage directly, so nothing else changes. That was an explicit design decision from day one.</p></div><div lang="bn"><p class="q">প্রশ্ন: আসল ব্যাকএন্ড যুক্ত করবে কীভাবে?</p><p>উত্তর: পুরো সিস্টেমে ডেটার ঠিক দুটি দরজা: <code class="inline">data.js</code> (কনটেন্ট) আর <code class="inline">TB.state</code> (ইউজার ডেটা)। ব্যাকএন্ড সংস্করণে এই দুটোকে API call দিয়ে বদলালেই হবে — UI মডিউলগুলো সরাসরি storage ধরে না, তাই অন্য কিছু বদলাতে হবে না। এটা প্রথম দিন থেকেই ইচ্ছাকৃত ডিজাইন সিদ্ধান্ত ছিল।</p></div></div>
+  </section>
+
+  <!-- ==================== 23. CODE WALKTHROUGH ==================== -->
+  <section class="doc-sec" id="s23">
+    <h2><span lang="en">23. Code walkthrough — understand every line</span><span class="bn-h" lang="bn">২৩. কোড ওয়াকথ্রু — প্রতিটা লাইন বুঝে বলার জন্য</span></h2>
+
+    <div class="lang-block" lang="en">
+      <p>This section takes the most important code pieces and explains them <b>line by line</b>. To find any of these in the project: open the file named in the caption, then press <code class="inline">Ctrl+F</code> and search the function name. To locate <i>which file</i> has which feature, use the feature→file table in section 19.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>এই অংশে সবচেয়ে গুরুত্বপূর্ণ কোডগুলো <b>লাইন ধরে ধরে</b> ব্যাখ্যা করা হলো। প্রজেক্টে কোনোটা খুঁজতে: ক্যাপশনে লেখা ফাইলটা খুলে <code class="inline">Ctrl+F</code> চেপে ফাংশনের নাম সার্চ করো। কোন ফিচার কোন ফাইলে আছে তা সেকশন ১৯-এর টেবিলে আছে।</p>
+    </div>
+
+    <!-- A -->
+    <h3 class="mini"><span lang="en">A. Turning data into cards — <code>research.js → renderGrid()</code></span><span class="bn-h" lang="bn">ক. ডেটা থেকে কার্ড বানানো — research.js</span></h3>
+    <pre class="code">grid.innerHTML = list.map(function (r, i) {          // ① run once per idea
+  return '&lt;article class="idea-card"&gt;' +             // ② build an HTML string
+         '  &lt;h3&gt;' + TB.esc(r.title) + '&lt;/h3&gt;' +      // ③ insert data (safely)
+         '  &lt;button data-action="view-idea" data-id="' + r.id + '"&gt;View Details&lt;/button&gt;' +
+         '&lt;/article&gt;';
+}).join('');                                          // ④ glue into ONE string</pre>
+    <div class="lang-block" lang="en">
+      <ul class="tight">
+        <li><b>① <code class="inline">list.map(fn)</code></b> — runs the function once for every idea in the list and collects all returned strings into a new array.</li>
+        <li><b>②③</b> — each run returns one small HTML template with that idea's data inserted; <code class="inline">TB.esc()</code> converts <code class="inline">&lt; &gt; &amp; "</code> into safe entities, so data can never inject HTML (security).</li>
+        <li><b>④ <code class="inline">.join('')</code></b> — glues the array into a single string. One <code class="inline">innerHTML</code> write is far faster than writing 20 cards one by one.</li>
+        <li><code class="inline">data-id</code> — stores the idea's number on the button, so the click handler later knows <i>which</i> idea to open.</li>
+      </ul>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <ul class="tight">
+        <li><b>① <code class="inline">list.map(fn)</code></b> — তালিকার প্রতিটা আইডিয়ার জন্য একবার করে ফাংশনটা চালায়, আর ফেরত আসা স্ট্রিংগুলো একটা নতুন array-তে জমা হয়।</li>
+        <li><b>②③</b> — প্রতিবার একটা ছোট HTML টেমপ্লেট তৈরি হয়, ভেতরে ওই আইডিয়ার ডেটা বসে; <code class="inline">TB.esc()</code> ফাংশনটা <code class="inline">&lt; &gt; &amp; "</code> চিহ্নগুলোকে নিরাপদ রূপে বদলে দেয় — যাতে ডেটা দিয়ে কেউ ক্ষতিকর HTML ঢুকিয়ে দিতে না পারে (নিরাপত্তা)।</li>
+        <li><b>④ <code class="inline">.join('')</code></b> — array-র সব স্ট্রিং জোড়া দিয়ে একটাই বড় স্ট্রিং বানায়। একবার <code class="inline">innerHTML</code> লেখা, ২০ বার লেখার চেয়ে অনেক দ্রুত।</li>
+        <li><code class="inline">data-id</code> — বাটনের গায়ে আইডিয়ার নম্বর বহন করে; পরে ক্লিক হ্যান্ডলার এটা পড়ে বোঝে কোন আইডিয়া খুলতে হবে।</li>
+      </ul>
+    </div>
+
+    <!-- B -->
+    <h3 class="mini"><span lang="en">B. One listener for all cards — event delegation</span><span class="bn-h" lang="bn">খ. সব কার্ডের জন্য একটাই লিসেনার — event delegation</span></h3>
+    <pre class="code">mount.addEventListener('click', function (e) {       // listen on the CONTAINER
+  const view = e.target.closest('[data-action="view-idea"]');
+  if (view) TB.openIdeaModal(parseInt(view.dataset.id, 10));
+});</pre>
+    <div class="lang-block" lang="en">
+      <ul class="tight">
+        <li><code class="inline">e.target</code> — the exact element that was clicked (maybe the icon inside the button, not the button itself).</li>
+        <li><code class="inline">.closest('[data-action=…]')</code> — walks <b>up</b> the family tree until it finds a matching button; that is why clicking the small icon still works.</li>
+        <li>Because the listener sits on the container, it keeps working after cards are re-rendered (every filter/search re-render) — no re-binding needed. This pattern is called <b>event delegation</b>.</li>
+      </ul>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <ul class="tight">
+        <li><code class="inline">e.target</code> — যে এলিমেন্টে আসলে ক্লিক হলো সেটাই (অনেক সময় বাটনের ভেতরের আইকন, বাটন নিজে নয়)।</li>
+        <li><code class="inline">.closest('[data-action=…]')</code> — পরিবারের গাছ ধরে <b>উপরের দিকে</b> উঠতে থাকে যতক্ষণ না মিলে যাওয়া বাটন পায়; তাই আইকনে ক্লিক করলেও কাজ করে।</li>
+        <li>লিসেনারটা কন্টেইনারে বসানো, তাই কার্ড বারবার নতুন করে বসালেও (ফিল্টার/সার্চে) লিসেনার মরে না — আবার বাঁধতে হয় না। এই কৌশলের নাম <b>event delegation</b>।</li>
+      </ul>
+    </div>
+
+    <!-- C -->
+    <h3 class="mini"><span lang="en">C. Debounce — why the search never lags</span><span class="bn-h" lang="bn">গ. Debounce — সার্চ কেন ধীর হয় না</span></h3>
+    <pre class="code">searchInput.addEventListener('input', TB.debounce(function () {
+  renderGrid();
+}, 140));
+
+// the helper (main.js)
+TB.debounce = function (fn, ms) {
+  let timer;
+  return function () {
+    clearTimeout(timer);          // ① cancel the previous wait
+    timer = setTimeout(fn, ms);   // ② start a fresh wait
+  };
+};</pre>
+    <div class="lang-block" lang="en">
+      <ul class="tight">
+        <li><code class="inline">input</code> fires on <i>every keystroke</i> — re-rendering the whole grid per letter is wasteful.</li>
+        <li><code class="inline">debounce</code> returns a wrapped function that only runs the real work after <b>140&nbsp;ms of silence</b>.</li>
+        <li>Each new keystroke resets the timer (① cancels, ② restarts) — so filtering runs once, right after you stop typing.</li>
+      </ul>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <ul class="tight">
+        <li><code class="inline">input</code> ইভেন্ট প্রতিটা অক্ষরে চলে — প্রতি অক্ষরে পুরো গ্রিড আঁকা অপচয়।</li>
+        <li><code class="inline">debounce</code> এমন একটা মোড়ানো ফাংশন দেয় যা কাজটা করে শুধু <b>১৪০ মিলিসেকেন্ড চুপ থাকার পর</b>।</li>
+        <li>প্রতিটা নতুন অক্ষর টাইমার রিসেট করে (① বাতিল, ② নতুন করে শুরু) — ফলে টাইপ থামার পর একবারই রেন্ডার হয়।</li>
+      </ul>
+    </div>
+
+    <!-- D -->
+    <h3 class="mini"><span lang="en">D. <code>TB.state</code> — the storage door (line by line)</span><span class="bn-h" lang="bn">ঘ. TB.state — স্টোরেজের দরজা (লাইন ধরে)</span></h3>
+    <pre class="code">TB.state = {
+  get: function (key, def) {
+    try {
+      const raw = localStorage.getItem(key);    // ① read the TEXT (or null)
+      if (raw !== null) return JSON.parse(raw); // ② text → real value
+    } catch (e) { /* corrupted value → ignore */ }
+    return def;                                 // ③ nothing saved → default
+  },
+  set: function (key, val) {
+    localStorage.setItem(key, JSON.stringify(val));            // value → text
+    document.dispatchEvent(new CustomEvent('tb:change', { detail: { key: key } }));
+  }                                            // ④ announce "data changed!"
+};</pre>
+    <div class="lang-block" lang="en">
+      <ul class="tight">
+        <li><b>Why JSON at all?</b> <code class="inline">localStorage</code> can only store <i>text</i>. <code class="inline">JSON.stringify</code> turns arrays/objects into text; <code class="inline">JSON.parse</code> turns them back.</li>
+        <li><code class="inline">get</code> never returns <code class="inline">undefined</code> — if nothing is saved it returns the <code class="inline">def</code>ault, so callers are always safe. <code class="inline">try/catch</code> guards against corrupted saved text.</li>
+        <li><b>④ is the clever part:</b> after saving, a <code class="inline">tb:change</code> event is broadcast. Other modules listen for it — e.g. the bookmark badge on the navbar updates instantly on every page, because everyone hears the same announcement.</li>
+      </ul>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <ul class="tight">
+        <li><b>JSON কেন দরকার?</b> <code class="inline">localStorage</code> শুধু <i>লেখা</i> (টেক্সট) রাখতে পারে। <code class="inline">JSON.stringify</code> array/object-কে টেক্সট বানায়, <code class="inline">JSON.parse</code> আবার আগের রূপে ফেরায়।</li>
+        <li><code class="inline">get</code> কখনো <code class="inline">undefined</code> দেয় না — কিছু সেভ না থাকলে <code class="inline">def</code> (ডিফল্ট) দেয়, তাই ডাকা জায়গাগুলো নিরাপদ। <code class="inline">try/catch</code> নষ্ট ডেটার বিরুদ্ধে ঢাল।</li>
+        <li><b>④ নম্বরটাই চালাকি:</b> সেভ করার পর একটা <code class="inline">tb:change</code> ঘোষণা ছড়িয়ে দেওয়া হয়। অন্য মডিউলগুলো এই ঘোষণা শুনে নিজেদের আপডেট করে — যেমন নেভবারের বুকমার্ক ব্যাজ সব পেজে সঙ্গে সঙ্গে বদলে যায়, কারণ সবাই একই ঘোষণা শোনে।</li>
+      </ul>
+    </div>
+
+    <!-- E -->
+    <h3 class="mini"><span lang="en">E. Modal system — the stack and the close rules</span><span class="bn-h" lang="bn">ঙ. মডাল সিস্টেম — স্ট্যাক ও বন্ধের নিয়ম</span></h3>
+    <pre class="code">const stack = [];                          // every open dialog, in order
+function open(opts) {
+  const overlay = buildOverlay(opts);      // dark backdrop + dialog box
+  stack.push(entry);                       // ① remember it (top of stack)
+  overlay.addEventListener('click', function (e) {
+    if (e.target === overlay) close();     // ② clicked the dark area itself
+  });
+}
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' &amp;&amp; stack.length)
+    stack[stack.length - 1].close();       // ③ close only the TOPMOST one
+});</pre>
+    <div class="lang-block" lang="en">
+      <ul class="tight">
+        <li><b>① the stack</b> — dialogs can open on top of dialogs (e.g. the matching quiz opens a supervisor profile). The last pushed is visually on top.</li>
+        <li><b>② <code class="inline">e.target === overlay</code></b> — true only when the click landed on the dark backdrop itself, not on anything inside the white box.</li>
+        <li><b>③ Escape</b> closes <code class="inline">stack[stack.length - 1]</code> — the topmost only, exactly like real applications.</li>
+        <li><code class="inline">close()</code> removes the CSS class first, waits ~230&nbsp;ms for the exit animation, <i>then</i> deletes the DOM node.</li>
+      </ul>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <ul class="tight">
+        <li><b>① স্ট্যাক</b> — মডালের উপর আরেকটা মডাল খুলতে পারে (যেমন ম্যাচিং কুইজ থেকে সুপারভাইজার প্রোফাইল)। সবার শেষে যোগ হওয়াটাই সবার উপরে থাকে।</li>
+        <li><b>② <code class="inline">e.target === overlay</code></b> — শুধু তখনই সত্যি যখন ক্লিক পড়েছে কালো আবরণের গায়ে, সাদা বাক্সের ভেতরের কিছুতে নয়।</li>
+        <li><b>③ Escape</b> চাপলে <code class="inline">stack[stack.length - 1]</code> — শুধু সবার উপরেরটা বন্ধ হয়, আসল অ্যাপের মতো।</li>
+        <li><code class="inline">close()</code> আগে CSS ক্লাস সরায়, ~২৩০ মি.সে. অপেক্ষা করে (যাতে বন্ধ হওয়ার অ্যানিমেশন দেখা যায়), <i>তারপর</i> DOM থেকে মুছে দেয়।</li>
+      </ul>
+    </div>
+
+    <!-- F -->
+    <h3 class="mini"><span lang="en">F. Counter animation — the easing math</span><span class="bn-h" lang="bn">চ. কাউন্টার অ্যানিমেশন — easing-এর অংক</span></h3>
+    <pre class="code">const tick = function (now) {
+  const p = Math.min((now - start) / 1500, 1);   // ① progress: 0 → 1 in 1.5s
+  const eased = 1 - Math.pow(1 - p, 3);          // ② ease-out curve
+  el.textContent = Math.round(target * eased) + suffix;
+  if (p &lt; 1) requestAnimationFrame(tick);        // ③ next screen frame
+};</pre>
+    <div class="lang-block" lang="en">
+      <ul class="tight">
+        <li><b>①</b> <code class="inline">p</code> = how far through the animation we are (0 at start, 1 at end); <code class="inline">Math.min(…, 1)</code> caps it so it never overshoots.</li>
+        <li><b>②</b> the curve <code class="inline">1-(1-p)³</code> makes counting fast at first, slow at the end. Check: p = 0.5 → eased ≈ 0.875 — already 87% there.</li>
+        <li><b>③</b> <code class="inline">requestAnimationFrame(tick)</code> says "call me again before the next screen frame" (~60×/second) — the browser's built-in animation clock.</li>
+      </ul>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <ul class="tight">
+        <li><b>①</b> <code class="inline">p</code> = অ্যানিমেশন কতদূর এগোলো (শুরুতে ০, শেষে ১); <code class="inline">Math.min(…, 1)</code> সীমা টানে, যাতে ১-এর বেশি না হয়।</li>
+        <li><b>②</b> সূত্রটা <code class="inline">1-(1-p)³</code> — শুরুতে দ্রুত গুনে, শেষে ধীরে থামে। হিসাব দেখো: p = 0.5 হলে eased ≈ 0.875 — অর্থাৎ অর্ধেক সময়েই ৮৭% পথ পাড়ি।</li>
+        <li><b>③</b> <code class="inline">requestAnimationFrame(tick)</code> বলে "পরের স্ক্রিন-ফ্রেমের আগে আমাকে আবার ডাকো" (সেকেন্ডে ~৬০ বার) — এটাই ব্রাউজারের নিজস্ব অ্যানিমেশন ঘড়ি।</li>
+      </ul>
+    </div>
+
+    <!-- G -->
+    <h3 class="mini"><span lang="en">G. Match score — the weighted formula, line by line</span><span class="bn-h" lang="bn">ছ. ম্যাচ স্কোর — ওয়েটেড সূত্র, লাইন ধরে</span></h3>
+    <pre class="code">function matchScore(sup, ans) {
+  let score = 0;                                            // ① start at 0
+  if (sup.areas.includes(ans.area)) score += 45;            // ② right area?
+  const hits = ans.techs.filter(t =&gt; sup.expertise.includes(t)).length;
+  score += (hits / ans.techs.length) * 25;                  // ③ tool overlap
+  if (sup.supervisionTypes.includes(ans.type)) score += 15; // ④ right type?
+  score += 10;                                              // ⑤ difficulty fit
+  return Math.min(99, Math.round(score));                   // ⑥ clamp + round
+}</pre>
+    <div class="lang-block" lang="en">
+      <ul class="tight">
+        <li><b>② 45 points</b> for the research area — the single most important thing, hence the biggest weight.</li>
+        <li><b>③</b> <code class="inline">hits</code> = how many of the user's technologies the supervisor actually knows; the fraction is scaled to 25. Knowing <i>all</i> tools = 25, <i>half</i> = 12.5.</li>
+        <li><b>④⑤</b> supervision type (15) and a flat difficulty fit (10) complete the 100-point scale.</li>
+        <li><b>⑥</b> <code class="inline">Math.min(99, …)</code> — never display a fake 100%; round to a whole number.</li>
+      </ul>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <ul class="tight">
+        <li><b>② ৪৫ পয়েন্ট</b> রিসার্চ এরিয়া মিললে — সবচেয়ে গুরুত্বপূর্ণ বিষয়, তাই সবচেয়ে বড় ওয়েট।</li>
+        <li><b>③</b> <code class="inline">hits</code> = ইউজারের জানা টেকনোলজির মধ্যে সুপারভাইজার আসলে ক'টা জানেন; ভগ্নাংশটা ২৫-এ স্কেল করা। সবগুলো জানলে ২৫, অর্ধেক জানলে ১২.৫।</li>
+        <li><b>④⑤</b> সুপারভিশন টাইপ (১৫) আর ডিফিকাল্টি-ফিট (১০) — মিলিয়ে ১০০-এর স্কেল পূর্ণ।</li>
+        <li><b>⑥</b> <code class="inline">Math.min(99, …)</code> — কখনো মিথ্যা ১০০% দেখায় না; পূর্ণসংখ্যায় ঘোরানো হয়।</li>
+      </ul>
+    </div>
+
+    <!-- H -->
+    <h3 class="mini"><span lang="en">H. Spring physics — a two-line engine</span><span class="bn-h" lang="bn">জ. স্প্রিং ফিজিক্স — দুই লাইনের ইঞ্জিন</span></h3>
+    <pre class="code">n.vx = (n.vx + (anchor.x - n.x) * 0.016) * 0.90;   // ① velocity update
+n.x  = n.x + n.vx;                                 // ② move the node</pre>
+    <div class="lang-block" lang="en">
+      <ul class="tight">
+        <li><code class="inline">(anchor.x - n.x)</code> — the distance from home. Multiplied by <b>0.016</b> it becomes a gentle pull toward home (the spring force).</li>
+        <li>That force is <b>added to the existing velocity</b> — so the node keeps momentum (inertia), it doesn't teleport.</li>
+        <li><b>× 0.90</b> — damping: every frame 10% of the velocity disappears, so the wobble eventually settles instead of bouncing forever.</li>
+        <li>② applies the velocity. Pull + inertia + friction = a real spring feel, in two lines. (Same pattern on the y-axis.)</li>
+      </ul>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <ul class="tight">
+        <li><code class="inline">(anchor.x - n.x)</code> — বাড়ি থেকে দূরত্ব। ×<b>০.০১৬</b> করলে সেটা হয় বাড়ির দিকে হালকা টান (স্প্রিং-বল)।</li>
+        <li>টানটা <b>আগের বেগের সাথে যোগ</b> হয় — তাই নোডটা ঝাঁপ দেয় না, ভেসে ভেসে আসে (জড়তা/inertia)।</li>
+        <li><b>× ০.৯০</b> — ড্যাম্পিং: প্রতি ফ্রেমে বেগের ১০% কমে যায়, তাই দুলতে দুলতে একসময় থেমে যায়, চিরকাল দোলে না।</li>
+        <li>② বেগ ধরে নোড সরায়। টান + জড়তা + ঘর্ষণ = আসল স্প্রিং-এর অনুভূতি, মাত্র দুই লাইনে। (y-অক্ষেও একই প্যাটার্ন।)</li>
+      </ul>
+    </div>
+
+    <!-- I -->
+    <h3 class="mini"><span lang="en">I. Dark mode — why one attribute re-colors everything</span><span class="bn-h" lang="bn">ঝ. ডার্ক মোড — একটা attribute-এ সব রং কেন বদলায়</span></h3>
+    <pre class="code">:root               { --bg: #f5f8f6; }      /* the default values */
+[data-theme='dark'] { --bg: #0c1512; }      /* same names, dark values */
+
+.card  { background: var(--bg); }           /* 200+ rules all read --bg */</pre>
+    <div class="lang-block" lang="en">
+      <ul class="tight">
+        <li><code class="inline">var(--bg)</code> is not a stored color — it is a <b>live lookup</b> that re-resolves whenever the variable changes.</li>
+        <li>Toggling <code class="inline">data-theme</code> on <code class="inline">&lt;html&gt;</code> makes the browser re-compute every rule that uses any variable — the whole site repaints at once.</li>
+        <li>That is why no component needs a separate "dark version" — components only <i>consume</i> variables; the theme owns the values.</li>
+      </ul>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <ul class="tight">
+        <li><code class="inline">var(--bg)</code> কোনো জমানো রং নয় — এটা <b>সরাসরি চলমান খোঁজ</b>, variable বদলালেই নতুন মান নিয়ে নেয়।</li>
+        <li><code class="inline">&lt;html&gt;</code>-এ <code class="inline">data-theme</code> বদলালেই ব্রাউজার যেসব নিয়মে variable ব্যবহার হয়েছে সবগুলো নতুন করে হিসাব করে — গোটা সাইট এক নিমেষে রঙ বদলায়।</li>
+        <li>তাই কোনো কম্পোনেন্টের আলাদা "ডার্ক সংস্করণ" লাগে না — কম্পোনেন্ট শুধু variable <i>ব্যবহার</i> করে; মানগুলোর মালিক থিম।</li>
+      </ul>
+    </div>
+
+    <!-- J -->
+    <h3 class="mini"><span lang="en">J. Live console demo — prove it to your teacher in 10 seconds</span><span class="bn-h" lang="bn">ঝ. লাইভ কনসোল ডেমো — শিক্ষককে ১০ সেকেন্ডে প্রমাণ</span></h3>
+    <div class="lang-block" lang="en">
+      <p>Press <code class="inline">F12</code> → Console tab on the running site and type these lines one by one — each one proves a real system live:</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>চালু সাইটে <code class="inline">F12</code> চেপে Console ট্যাবে গিয়ে এই লাইনগুলো একটা একটা করে লেখো — প্রতিটাই একটা আসল সিস্টেম জীবন্তভাবে প্রমাণ করবে:</p>
+    </div>
+    <pre class="code">TB_DATA.researchIdeas.length   // → 20   (the data file is real &amp; loaded)
+TB.state.get('tb_user')        // → your profile object (Nasif Shahrear…)
+TB.state.get('tb_bookmarks')   // → array of saved idea IDs
+TB.toggleBookmark(3)           // → saves idea #3 — watch the navbar badge jump!
+TB.toast('Hello teacher!')     // → fires a toast from pure console
+TB_DATA.supervisors[0].name    // → 'Dr. Ahmed Rahman' (peek any data)</pre>
+    <div class="lang-block" lang="en">
+      <p class="table-note">Why this is powerful: it shows the grader that state, data and functions are real, inspectable objects — not a fake picture. Also explains the design decision "all data through one door" (section 19).</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p class="table-note">এর শক্তি হলো: পরীক্ষক নিজের চোখে দেখেন যে ডেটা, স্টেট আর ফাংশনগুলো আসল, পরীক্ষা-করা যায় এমন বস্তু — কোনো নকল ছবি নয়। সাথে সেকশন ১৯-এর ডিজাইন সিদ্ধান্তটাও (সব ডেটা এক দরজা দিয়ে) প্রমাণিত হয়।</p>
+    </div>
+  </section>
+
+  <!-- ==================== 24. VIVA DRILL ==================== -->
+  <section class="doc-sec" id="s24">
+    <h2><span lang="en">24. Viva drill — two directions</span><span class="bn-h" lang="bn">২৪. ভাইভা ড্রিল — দুই দিক থেকে</span></h2>
+
+    <div class="lang-block" lang="en">
+      <p>Examiners ask in two directions: <b>(A)</b> they point at something on the website and ask "how does this work?" — you answer with the file, the function and one clear sentence; <b>(B)</b> they show a line of code and ask "what is this?" — you recognize it instantly. Drill both tables: cover the right column, go row by row. The (§n) links jump to the detailed section in this document.</p>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <p>পরীক্ষক দুই দিক থেকে জিজ্ঞেস করেন: <b>(ক)</b> ওয়েবসাইটের কোনো অংশ দেখিয়ে বলেন "এটা কীভাবে কাজ করে?" — তুমি ফাইল, ফাংশন আর এক লাইনের স্পষ্ট ব্যাখ্যা দাও; <b>(খ)</b> কোডের একটা লাইন দেখিয়ে বলেন "এটা কী?" — তুমি সঙ্গে সঙ্গে চিনে ফেলো। দুই টেবিলই ড্রিল করো: ডান কলাম ঢেকে রেখে সারি ধরে প্র্যাকটিস করো। (§n) লিংকগুলো এই ডকুমেন্টের বিস্তারিত অংশে নিয়ে যায়।</p>
+    </div>
+
+    <h3 class="mini"><span lang="en">A. Teacher points at a website part → you name the code</span><span class="bn-h" lang="bn">ক. ওয়েবসাইটের অংশ দেখালে → কোড বলবে</span></h3>
+    <div class="lang-block" lang="en">
+      <table class="map">
+        <tr><th style="width:26%">Teacher points at…</th><th style="width:26%">Code behind it</th><th>You say</th></tr>
+        <tr><td>Hamburger menu (mobile)</td><td><code>main.js · initNav()</code></td><td>Below 1080px the links become a fixed drawer pushed off-screen; the burger toggles <i>.open</i>, the scrim closes it, and the blur sits on ::before so position:fixed works. (<a href="#s5">§5</a>)</td></tr>
+        <tr><td>Dark / light toggle</td><td><code>main.js · initTheme()</code></td><td>Flips <i>data-theme</i> on &lt;html&gt;; every color is a CSS variable, so the site repaints instantly; the choice is saved. (<a href="#s16">§16</a>)</td></tr>
+        <tr><td>Bookmark icon + navbar badge</td><td><code>main.js · TB.toggleBookmark()</code></td><td>Read→modify→write of an ID array in localStorage, then fires <i>tb:change</i> so the badge recounts everywhere. (<a href="#s9">§9</a>)</td></tr>
+        <tr><td>Idea search box</td><td><code>research.js · results()</code></td><td>Debounced 140 ms; rebuilds the grid from ideas matching title, description, category, technology and tags. (<a href="#s8">§8</a>)</td></tr>
+        <tr><td>Filter chips + "Filters 2" pill</td><td><code>research.js</code> chip handler</td><td>Each chip adds/removes a value in the filter state; the pill counts active filters; Clear resets everything. (<a href="#s8">§8</a>)</td></tr>
+        <tr><td>Sort dropdown</td><td><code>research.js · results()</code></td><td>Five modes: featured score for Recommended, localeCompare for A–Z, a 1–3 difficulty map for the two difficulty sorts. (<a href="#s8">§8</a>)</td></tr>
+        <tr><td>"View Details" button</td><td><code>main.js · TB.openIdeaModal()</code></td><td>Finds the idea by id in data.js and opens the shared modal with problem, gap, methodology and outcome. (<a href="#s9">§9</a>)</td></tr>
+        <tr><td>"Match Me" button + quiz steps</td><td><code>supervisors.js · openMatchQuiz()</code></td><td>A 4-step wizard; every step validates before Next; the last step scores all 12 supervisors. (<a href="#s10">§10</a>)</td></tr>
+        <tr><td>"94% Research Match" bar</td><td><code>supervisors.js · matchScore()</code></td><td>Weighted score — area 45, tools 25, type 15, difficulty 10; the bar animates its width with a CSS transition. (<a href="#s10">§10</a>)</td></tr>
+        <tr><td>Roadmap circles + green line</td><td><code>publication.js · renderRoadmap()</code></td><td>Completed steps come from localStorage; the line's --tl-progress variable is set to the furthest completed step ÷ 8. (<a href="#s11">§11</a>)</td></tr>
+        <tr><td>"Mark as Complete"</td><td><code>publication.js</code> toggle handler</td><td>Toggles the step id in the saved array, re-renders timeline, percentage and panel, then toasts. (<a href="#s11">§11</a>)</td></tr>
+        <tr><td>Checklist "5 / 8 — 62%"</td><td><code>publication.js · renderChecklist()</code></td><td>completed ÷ total × 100 sets the bar width and label; every checkbox id is persisted. (<a href="#s12">§12</a>)</td></tr>
+        <tr><td>FAQ accordion</td><td><code>main.js · TB.renderFaq()</code></td><td>JS closes the previously open item; CSS grid-rows 0fr→1fr does the animation — no height math in JS. (<a href="#s14">§14</a>)</td></tr>
+        <tr><td>Login / Sign-up modals</td><td><code>main.js · openLogin() / openSignup()</code></td><td>Per-field validation (email regex, password length, match); success stores a demo profile and the navbar re-renders via tb:change. (<a href="#s15">§15</a>)</td></tr>
+        <tr><td>Toast popup</td><td><code>main.js · TB.toast()</code></td><td>Appends to a fixed stack, slides in via a class, auto-dismisses after 3.4 s, max 4 at a time. (<a href="#s17">§17</a>)</td></tr>
+        <tr><td>Any modal close (X / backdrop / Esc)</td><td><code>main.js · TB.modal</code></td><td>All dialogs share one system: a stack; Escape closes the topmost; backdrop clicks close only when the dark area itself was hit. (<a href="#s17">§17</a>)</td></tr>
+        <tr><td>FIG. 01 network (drag, pulses, tap)</td><td><code>network.js · physics() / render()</code></td><td>SVG nodes with spring physics (pull 0.016, damping 0.9), pulses interpolate along edges, pointer events drag nodes, tap opens guidance and the graph reflows above it. (<a href="#s6">§6</a>)</td></tr>
+        <tr><td>Count-up numbers + fade-in cards</td><td><code>main.js · initStats() / TB.observeReveals()</code></td><td>IntersectionObserver triggers once when visible; counters use a rAF loop with cubic ease-out over 1.5 s. (<a href="#s7">§7</a>)</td></tr>
+        <tr><td>Saved Ideas panel</td><td><code>main.js · TB.openSavedIdeas()</code></td><td>Reads the ID array, maps it to idea objects, renders rows with view/remove; shows a friendly empty state when none. (<a href="#s9">§9</a>)</td></tr>
+      </table>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <table class="map">
+        <tr><th style="width:26%">শিক্ষক দেখালেন…</th><th style="width:26%">পেছনের কোড</th><th>তুমি বলবে</th></tr>
+        <tr><td>হ্যামবার্গার মেনু (মোবাইল)</td><td><code>main.js · initNav()</code></td><td>১০৮০px-এর নিচে লিংকগুলো হয় fixed ড্রয়ার, স্ক্রিনের বাইরে সরানো থাকে; বার্গার .open টগল করে, scrim-এ ক্লিকে বন্ধ, আর blur ::before-এ থাকায় position:fixed কাজ করে। (<a href="#s5">§5</a>)</td></tr>
+        <tr><td>ডার্ক/লাইট টগল</td><td><code>main.js · initTheme()</code></td><td>&lt;html&gt;-এ data-theme উল্টে দেয়; সব রঙ CSS variable, তাই সাইট মুহূর্তেই রঙ বদলায়; পছন্দ সেভ থাকে। (<a href="#s16">§16</a>)</td></tr>
+        <tr><td>বুকমার্ক আইকন + নেভবার ব্যাজ</td><td><code>main.js · TB.toggleBookmark()</code></td><td>localStorage-এ ID-র array পড়া→বদলানো→লেখা, তারপর tb:change ছড়ায় — ফলে ব্যাজ সব জায়গায় নতুন সংখ্যা দেখায়। (<a href="#s9">§9</a>)</td></tr>
+        <tr><td>আইডিয়া সার্চ বক্স</td><td><code>research.js · results()</code></td><td>১৪০ms ডিবাউন্স; টাইটেল, বর্ণনা, ক্যাটাগরি, টেকনোলজি, ট্যাগ মিলিয়ে গ্রিড নতুন করে আঁকে। (<a href="#s8">§8</a>)</td></tr>
+        <tr><td>ফিল্টার চিপ + "Filters 2" পিল</td><td><code>research.js</code> চিপ হ্যান্ডলার</td><td>চিপ স্টেট-array-তে মান যোগ/বাদ দেয়; পিল চালু ফিল্টার গুনে দেখায়; Clear সব রিসেট করে। (<a href="#s8">§8</a>)</td></tr>
+        <tr><td>সর্ট ড্রপডাউন</td><td><code>research.js · results()</code></td><td>পাঁচ মোড: Recommended-এ featured স্কোর, A–Z-এ localeCompare, ডিফিকাল্টি সর্টে ১–৩ ম্যাপ। (<a href="#s8">§8</a>)</td></tr>
+        <tr><td>"View Details" বাটন</td><td><code>main.js · TB.openIdeaModal()</code></td><td>data.js-এ ID ধরে আইডিয়া খুঁজে শেয়ার্ড মডালে সমস্যা, গ্যাপ, পদ্ধতি, ফলাফল দেখায়। (<a href="#s9">§9</a>)</td></tr>
+        <tr><td>"Match Me" বাটন + কুইজ</td><td><code>supervisors.js · openMatchQuiz()</code></td><td>৪-ধাপের উইজার্ড; প্রতিটা ধাপ Next-এর আগে যাচাই হয়; শেষ ধাপে ১২ সুপারভাইজারকে স্কোর করে। (<a href="#s10">§10</a>)</td></tr>
+        <tr><td>"94% Research Match" বার</td><td><code>supervisors.js · matchScore()</code></td><td>ওয়েটেড স্কোর — এরিয়া ৪৫, টুলস ২৫, টাইপ ১৫, ডিফিকাল্টি ১০; বারের প্রস্থ CSS transition-এ অ্যানিমেট হয়। (<a href="#s10">§10</a>)</td></tr>
+        <tr><td>রোডম্যাপের বৃত্ত + সবুজ লাইন</td><td><code>publication.js · renderRoadmap()</code></td><td>সম্পন্ন ধাপগুলো localStorage থেকে আসে; লাইনের --tl-progress variable সবচেয়ে দূরের সম্পন্ন ধাপ ÷ ৮ দিয়ে সেট হয়। (<a href="#s11">§11</a>)</td></tr>
+        <tr><td>"Mark as Complete"</td><td><code>publication.js</code> টগল হ্যান্ডলার</td><td>সেভ-অ্যারেতে ধাপের ID টগল করে, টাইমলাইন-শতকরা-প্যানেল নতুন করে আঁকে, টোস্ট দেখায়। (<a href="#s11">§11</a>)</td></tr>
+        <tr><td>চেকলিস্ট "5 / 8 — 62%"</td><td><code>publication.js · renderChecklist()</code></td><td>সম্পন্ন ÷ মোট × ১০০ দিয়ে বারের প্রস্থ ও লেবেল সেট হয়; প্রতিটা চেকবক্সের ID সেভ হয়। (<a href="#s12">§12</a>)</td></tr>
+        <tr><td>FAQ অ্যাকর্ডিয়ন</td><td><code>main.js · TB.renderFaq()</code></td><td>JS আগের খোলা আইটেম বন্ধ করে; CSS grid-rows 0fr→1fr অ্যানিমেশন দেয় — JS-এ কোনো উচ্চতার হিসাব নেই। (<a href="#s14">§14</a>)</td></tr>
+        <tr><td>লগইন / সাইন-আপ মডাল</td><td><code>main.js · openLogin() / openSignup()</code></td><td>ঘর-ধরে ভ্যালিডেশন (ইমেইল regex, পাসওয়ার্ড দৈর্ঘ্য, ম্যাচ); সফল হলে ডেমো প্রোফাইল সেভ হয় আর নেভবার tb:change-এ নতুন হয়। (<a href="#s15">§15</a>)</td></tr>
+        <tr><td>টোস্ট</td><td><code>main.js · TB.toast()</code></td><td>fixed স্ট্যাকে যোগ হয়, ক্লাস দিয়ে ভেসে আসে, ৩.৪ সেকেন্ডে মিলিয়ে যায়, একবারে সর্বোচ্চ ৪টা। (<a href="#s17">§17</a>)</td></tr>
+        <tr><td>যেকোনো মডাল বন্ধ (X / বাইরে / Esc)</td><td><code>main.js · TB.modal</code></td><td>সব ডায়ালগ এক সিস্টেম ভাগ করে: স্ট্যাক থাকে; Escape উপরেরটা বন্ধ করে; কালো আবরণে নিজে ক্লিক হলেই কেবল বন্ধ হয়। (<a href="#s17">§17</a>)</td></tr>
+        <tr><td>FIG. 01 নেটওয়ার্ক (ড্র্যাগ, পালস, ট্যাপ)</td><td><code>network.js · physics() / render()</code></td><td>SVG নোডে স্প্রিং ফিজিক্স (টান ০.০১৬, ড্যাম্পিং ০.৯), পালস লাইন বরাবর interpolate করে, pointer event-এ ড্র্যাগ, ট্যাপে গাইড আর গ্রাফ উপরে সরে যায়। (<a href="#s6">§6</a>)</td></tr>
+        <tr><td>গুনে-ওঠা সংখ্যা + ফেড-ইন কার্ড</td><td><code>main.js · initStats() / TB.observeReveals()</code></td><td>দেখা গেলে একবার IntersectionObserver চালু হয়; কাউন্টার ১.৫ সেকেন্ডে cubic ease-out সহ rAF লুপে চলে। (<a href="#s7">§7</a>)</td></tr>
+        <tr><td>Saved Ideas প্যানেল</td><td><code>main.js · TB.openSavedIdeas()</code></td><td>ID-অ্যারে পড়ে আইডিয়া অবজেক্টে ম্যাপ করে, view/remove সারি আঁকে; খালি থাকলে empty state। (<a href="#s9">§9</a>)</td></tr>
+      </table>
+    </div>
+
+    <h3 class="mini"><span lang="en">B. Teacher shows a code line → you identify it</span><span class="bn-h" lang="bn">খ. কোডের লাইন দেখালে → চিনে বলবে</span></h3>
+    <div class="lang-block" lang="en">
+      <table class="map">
+        <tr><th style="width:38%">If you see this line…</th><th>You say</th><th style="width:14%">File</th></tr>
+        <tr><td><code>grid-template-rows: 0fr → 1fr</code></td><td>CSS-only accordion — JS just toggles .open; the grid-rows transition animates the height with no JS math. (<a href="#s14">§14</a>)</td><td><code>style.css</code></td></tr>
+        <tr><td><code>JSON.stringify(val)</code> + <code>dispatchEvent('tb:change')</code></td><td>The storage door: save user data and broadcast, so every module re-renders on change. (<a href="#s19">§19</a>)</td><td><code>main.js</code></td></tr>
+        <tr><td><code>e.target.closest('[data-action=…]')</code></td><td>Event delegation — one container listener survives card re-renders; closest finds the button even when an icon was clicked. (<a href="#s23">§23-B</a>)</td><td><code>research.js</code></td></tr>
+        <tr><td><code>clearTimeout(timer); timer = setTimeout(fn, ms)</code></td><td>Debounce — the work runs once, after 140 ms of typing silence. (<a href="#s23">§23-C</a>)</td><td><code>main.js</code></td></tr>
+        <tr><td><code>Math.pow(1 - p, 3)</code></td><td>Cubic ease-out for the counter — fast start, slow finish. (<a href="#s23">§23-F</a>)</td><td><code>main.js</code></td></tr>
+        <tr><td><code>if (sup.areas.includes(ans.area)) score += 45</code></td><td>Supervisor matching weights: area 45, tools 25, type 15, difficulty 10 — out of 100. (<a href="#s10">§10</a>)</td><td><code>supervisors.js</code></td></tr>
+        <tr><td><code>(anchor.x - n.x) * 0.016) * 0.90</code></td><td>Spring physics: pull toward the anchor, keep inertia, remove 10% velocity per frame. (<a href="#s23">§23-H</a>)</td><td><code>network.js</code></td></tr>
+        <tr><td><code>stack[stack.length - 1].close()</code></td><td>Modal stack — Escape closes only the topmost dialog. (<a href="#s23">§23-E</a>)</td><td><code>main.js</code></td></tr>
+        <tr><td><code>/^[^\s@]+@[^\s@]+\.[^\s@]+$/</code></td><td>Email format check — text @ text . text, no spaces. (<a href="#s15">§15</a>)</td><td><code>main.js</code></td></tr>
+        <tr><td><code>document.documentElement.dataset.theme = next</code></td><td>Dark mode — one attribute change; all colors are variables that re-resolve everywhere. (<a href="#s16">§16</a>)</td><td><code>main.js</code></td></tr>
+        <tr><td><code>repeat(auto-fill, minmax(310px, 1fr))</code></td><td>Responsive columns without media queries — the grid adds/removes columns based on width. (<a href="#s18">§18</a>)</td><td><code>style.css</code></td></tr>
+        <tr><td><code>data-mount="research"</code> + <code>querySelectorAll('[data-mount=…]')</code></td><td>Module mounting — the HTML marks <i>where</i>, the JS module decides <i>what</i> to render there. (<a href="#s4">§4</a>)</td><td>HTML + modules</td></tr>
+        <tr><td><code>new IntersectionObserver(…, { threshold: 0.4 })</code></td><td>Trigger-on-visible — the counters start only when 40% of the number is on screen. (<a href="#s7">§7</a>)</td><td><code>main.js</code></td></tr>
+        <tr><td><code>TB.esc(r.title)</code></td><td>Escapes &lt; &gt; &amp; " — data content can never inject HTML (basic XSS safety). (<a href="#s23">§23-A</a>)</td><td>all modules</td></tr>
+      </table>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <table class="map">
+        <tr><th style="width:38%">এই লাইন দেখলে…</th><th>তুমি বলবে</th><th style="width:14%">ফাইল</th></tr>
+        <tr><td><code>grid-template-rows: 0fr → 1fr</code></td><td>শুধু-CSS অ্যাকর্ডিয়ন — JS শুধু .open টগল করে; grid-rows ট্রানজিশন উচ্চতা অ্যানিমেট করে, JS-এ কোনো হিসাব নেই। (<a href="#s14">§14</a>)</td><td><code>style.css</code></td></tr>
+        <tr><td><code>JSON.stringify(val)</code> + <code>dispatchEvent('tb:change')</code></td><td>স্টোরেজের দরজা: ডেটা সেভ করে ঘোষণা ছড়ায়, ফলে সব মডিউল বদলে যাওয়া ডেটা নিয়ে নতুন করে আঁকে। (<a href="#s19">§19</a>)</td><td><code>main.js</code></td></tr>
+        <tr><td><code>e.target.closest('[data-action=…]')</code></td><td>Event delegation — কন্টেইনারের একটাই লিসেনার কার্ড নতুন করে বসালেও বেঁচে থাকে; আইকনে ক্লিক হলেও closest বাটন খুঁজে পায়। (<a href="#s23">§23-B</a>)</td><td><code>research.js</code></td></tr>
+        <tr><td><code>clearTimeout(timer); timer = setTimeout(fn, ms)</code></td><td>Debounce — টাইপিং থামার ১৪০ms পর কাজটা একবারই চলে। (<a href="#s23">§23-C</a>)</td><td><code>main.js</code></td></tr>
+        <tr><td><code>Math.pow(1 - p, 3)</code></td><td>কাউন্টারের cubic ease-out — শুরুতে দ্রুত, শেষে ধীর। (<a href="#s23">§23-F</a>)</td><td><code>main.js</code></td></tr>
+        <tr><td><code>if (sup.areas.includes(ans.area)) score += 45</code></td><td>সুপারভাইজার ম্যাচিংয়ের ওয়েট: এরিয়া ৪৫, টুলস ২৫, টাইপ ১৫, ডিফিকাল্টি ১০ — ১০০-এর মধ্যে। (<a href="#s10">§10</a>)</td><td><code>supervisors.js</code></td></tr>
+        <tr><td><code>(anchor.x - n.x) * 0.016) * 0.90</code></td><td>স্প্রিং ফিজিক্স: বাড়ির দিকে টান, জড়তা ধরে রাখা, প্রতি ফ্রেমে বেগের ১০% কমানো। (<a href="#s23">§23-H</a>)</td><td><code>network.js</code></td></tr>
+        <tr><td><code>stack[stack.length - 1].close()</code></td><td>মডাল স্ট্যাক — Escape শুধু সবার উপরের ডায়ালগ বন্ধ করে। (<a href="#s23">§23-E</a>)</td><td><code>main.js</code></td></tr>
+        <tr><td><code>/^[^\s@]+@[^\s@]+\.[^\s@]+$/</code></td><td>ইমেইল ফরম্যাট যাচাই — লেখা @ লেখা . লেখা, স্পেস নিষেধ। (<a href="#s15">§15</a>)</td><td><code>main.js</code></td></tr>
+        <tr><td><code>document.documentElement.dataset.theme = next</code></td><td>ডার্ক মোড — একটা attribute বদল; সব রঙ variable হওয়ায় সবখানে সঙ্গে সঙ্গে প্রয়োগ হয়। (<a href="#s16">§16</a>)</td><td><code>main.js</code></td></tr>
+        <tr><td><code>repeat(auto-fill, minmax(310px, 1fr))</code></td><td>মিডিয়া-কোয়েরি ছাড়াই রেসপনসিভ কলাম — প্রস্থ অনুযায়ী grid নিজেই কলাম যোগ/বাদ দেয়। (<a href="#s18">§18</a>)</td><td><code>style.css</code></td></tr>
+        <tr><td><code>data-mount="research"</code> + <code>querySelectorAll('[data-mount=…]')</code></td><td>মডিউল মাউন্টিং — HTML স্থান ঠিক করে, JS মডিউল ঠিক করে সেখানে কী বসবে। (<a href="#s4">§4</a>)</td><td>HTML + modules</td></tr>
+        <tr><td><code>new IntersectionObserver(…, { threshold: 0.4 })</code></td><td>দেখা গেলে ট্রিগার — সংখ্যার ৪০% স্ক্রিনে এলেই কাউন্টার চালু হয়। (<a href="#s7">§7</a>)</td><td><code>main.js</code></td></tr>
+        <tr><td><code>TB.esc(r.title)</code></td><td>&lt; &gt; &amp; " এস্কেপ করে — ডেটা দিয়ে কখনো HTML ইনজেক্ট করা যায় না (বেসিক XSS সুরক্ষা)। (<a href="#s23">§23-A</a>)</td><td>সব মডিউল</td></tr>
+      </table>
+    </div>
+
+    <div class="lang-block" lang="en">
+      <div class="warn" style="margin-top:14px">🎯 <b>How to practice:</b> open the site in one window and this table in another. Ask a friend (or use a random number) to pick a row — point at the real element, say the file + function + one sentence out loud. Ten minutes a day covers the whole site.</div>
+    </div>
+    <div class="lang-block" lang="bn">
+      <span class="bn-tag">বাংলা</span>
+      <div class="warn" style="margin-top:14px">🎯 <b>প্র্যাকটিসের নিয়ম:</b> এক উইন্ডোতে সাইট, আরেক উইন্ডোতে এই টেবিল খোলো। বন্ধুকে বলো যেকোনো সারি বেছে নিতে — আসল এলিমেন্টটা দেখিয়ে ফাইল + ফাংশন + এক লাইনের ব্যাখ্যা মুখে বলো। দিনে ১০ মিনিটে গোটা সাইট কভার হয়ে যাবে।</div>
+    </div>
+  </section>
+
+  <div class="warn">
+    <span class="warn-text" lang="en">📌 <b>Note for the presentation:</b> This file is for preparation only — it is <b>not linked anywhere</b> in the website itself. Open it directly (double-click the file) or print it to PDF.</span>
+    <div lang="bn"><p class="warn-text">📌 <b>প্রেজেন্টেশনের নোট:</b> এই ফাইলটি শুধু প্রস্তুতির জন্য — ওয়েবসাইটের কোথাও এর কোনো লিংক <b>নেই</b>। সরাসরি ডাবল-ক্লিক করে খুলুন, চাইলে PDF হিসেবে প্রিন্ট করুন।</p></div>
+  </div>
+
+</div>
+
+<footer class="doc">ThesisBridge BD — Project Documentation · Prepared by Nasif Shahrear (CSE22 · ID 2) · For academic presentation</footer>
+
+<script>
+  (function () {
+    var btns = document.querySelectorAll('.lang-switch button');
+    function apply(mode) {
+      document.body.dataset.lang = mode;
+      try { localStorage.setItem('tb_docs_lang', mode); } catch (e) {}
+      btns.forEach(function (b) { b.classList.toggle('active', b.dataset.mode === mode); });
+    }
+    btns.forEach(function (b) { b.addEventListener('click', function () { apply(b.dataset.mode); }); });
+    var saved = 'both';
+    try { saved = localStorage.getItem('tb_docs_lang') || 'both'; } catch (e) {}
+    apply(saved);
+  })();
+</script>
+</body>
+</html>

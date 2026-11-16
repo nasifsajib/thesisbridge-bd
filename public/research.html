@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Research Ideas — ThesisBridge BD</title>
+  <meta name="description" content="Search, filter and combine 20+ detailed thesis and project ideas across AI, IoT, cybersecurity, NLP and more — each with research gap, methodology and expected outcome.">
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem('tb_theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){document.documentElement.dataset.theme='light'}</script>
+</head>
+<body data-page="research">
+
+  <header class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="brand" aria-label="ThesisBridge BD home">
+        <img src="assets/icons/logo.svg" alt="" width="38" height="38">
+        <span class="b">ThesisBridge<span class="brand-accent">BD</span></span>
+      </a>
+      <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
+        <a class="nav-link" data-page-match="home" href="index.html">Home</a>
+        <a class="nav-link" data-page-match="research" href="research.html">Research Ideas</a>
+        <a class="nav-link" data-page-match="supervisors" href="supervisors.html">Supervisors</a>
+        <a class="nav-link" data-page-match="publication" href="publication.html">Publication</a>
+        <a class="nav-link" data-page-match="resources" href="resources.html">Resources</a>
+        <a class="nav-link" data-page-match="about" href="about.html">About</a>
+        <div class="nav-drawer-auth">
+          <button class="btn btn-outline" data-auth="login">Login</button>
+          <button class="btn btn-primary" data-auth="signup">Get Started</button>
+        </div>
+      </nav>
+      <div class="nav-actions">
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle dark mode"><i class="fa-solid fa-moon"></i></button>
+        <button class="icon-btn" id="savedBtn" data-open-saved aria-label="Open saved research ideas">
+          <i class="fa-regular fa-bookmark"></i>
+          <span class="count-badge" id="savedCount">0</span>
+        </button>
+        <div class="nav-auth" id="navAuth"></div>
+        <button class="icon-btn nav-burger" id="navBurger" aria-label="Open menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+      </div>
+    </div>
+  </header>
+  <div class="nav-scrim" id="navScrim"></div>
+
+  <main id="main">
+    <section class="page-hero">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a> <i class="fa-solid fa-chevron-right" style="font-size:.6rem"></i> Research Ideas</nav>
+        <h1>Research Idea <span style="color:var(--primary)">Explorer</span></h1>
+        <p class="lead">Every idea ships with its research problem, the gap it targets, a suggested methodology and the expected outcome. Filter by category, difficulty, type and technology — then bookmark what fits.</p>
+      </div>
+    </section>
+
+    <section class="section" id="research-explorer">
+      <div class="container">
+        <div data-mount="research"></div>
+      </div>
+    </section>
+
+    <section class="section section-alt" style="padding-top:48px">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow"><i class="fa-solid fa-circle-info"></i> How to use this</span>
+          <h2>From idea card to thesis proposal.</h2>
+        </div>
+        <div class="trio-grid">
+          <div class="trio-card card reveal">
+            <span class="pub-icon"><i class="fa-solid fa-filter"></i></span>
+            <h3>1 · Filter ruthlessly</h3>
+            <p>Combine category + difficulty + technology to match your skill level and the tools your department supports.</p>
+          </div>
+          <div class="trio-card card reveal">
+            <span class="pub-icon"><i class="fa-solid fa-bookmark"></i></span>
+            <h3>2 · Save &amp; shortlist</h3>
+            <p>Bookmark 3–5 ideas, then open each detail modal and check whether the research gap genuinely interests you.</p>
+          </div>
+          <div class="trio-card card reveal">
+            <span class="pub-icon"><i class="fa-solid fa-user-tie"></i></span>
+            <h3>3 · Take it to a supervisor</h3>
+            <p>Each idea lists potential supervisors — visit the <a href="supervisors.html">Supervisor Matching</a> page before you commit.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="brand">
+            <img src="assets/icons/logo.svg" alt="" width="36" height="36">
+            <span class="b">ThesisBridge<span class="brand-accent">BD</span></span>
+          </a>
+          <p>Your bridge to better research — a centralized hub for Bangladeshi undergraduate students to move from idea to publication.</p>
+        </div>
+        <div>
+          <h4>Platform</h4>
+          <ul class="footer-links">
+            <li><a href="research.html">Research Ideas</a></li>
+            <li><a href="supervisors.html">Supervisors</a></li>
+            <li><a href="publication.html">Publication Hub</a></li>
+            <li><a href="resources.html">Resource Library</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Learn</h4>
+          <ul class="footer-links">
+            <li><a href="index.html#roadmap">Research Roadmap</a></li>
+            <li><a href="publication.html#journal-checklist">Journal Checklist</a></li>
+            <li><a href="about.html">About &amp; FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>External</h4>
+          <ul class="footer-links">
+            <li><a href="https://scholar.google.com/" target="_blank" rel="noopener noreferrer">Google Scholar</a></li>
+            <li><a href="https://arxiv.org/" target="_blank" rel="noopener noreferrer">arXiv</a></li>
+            <li><a href="https://www.overleaf.com/" target="_blank" rel="noopener noreferrer">Overleaf</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span data-year>2026</span> ThesisBridge BD — University thesis/project platform. Sample content stored in Supabase.</span>
+        <span>Built with HTML, CSS &amp; vanilla JavaScript</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/api.js" defer></script>
+  <script src="js/research.js" defer></script>
+</body>
+</html>

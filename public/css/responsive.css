@@ -1,0 +1,175 @@
+/* ==========================================================================
+   ThesisBridge BD — Responsive Stylesheet
+   Breakpoints: 1080 · 900 · 840 · 768 · 620 · 480 · 380
+   Targets 320/375 mobile · 768 tablet · 1024 laptop · 1440 desktop.
+   ========================================================================== */
+
+/* ------------------------------ ≤ 1080px --------------------------------- */
+@media (max-width: 1080px) {
+
+  .nav-links {
+    position: fixed; top: var(--nav-h); right: 0; bottom: 0;
+    width: min(320px, 86vw);
+    flex-direction: column; align-items: stretch; gap: 4px;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    padding: 20px 16px;
+    margin-left: 0;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.22, 0.8, 0.35, 1);
+    overflow-y: auto;
+    z-index: 90;
+    box-shadow: var(--shadow-lg);
+  }
+  .nav-links.open { transform: translateX(0); }
+  .nav-link { padding: 13px 15px; font-size: 0.98rem; border-radius: var(--radius-sm); }
+  .nav-link.active::after { display: none; }
+  .nav-link.active { background: var(--primary-soft); }
+  .nav-burger { display: inline-grid; }
+  .nav-auth { display: none; }
+  .nav-drawer-auth { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; padding-top: 16px; border-top: 1px dashed var(--border); }
+  .nav-drawer-auth .btn { width: 100%; }
+
+  .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+  .hero-visual { width: 100%; max-width: 560px; justify-self: center; }
+}
+
+/* ------------------------------- ≤ 900px --------------------------------- */
+@media (max-width: 900px) {
+
+  .section { padding: 68px 0; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .rp-cols { grid-template-columns: 1fr; gap: 20px; }
+  .trio-grid, .duo-grid { grid-template-columns: 1fr; }
+
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 30px; }
+  .footer-brand { grid-column: 1 / -1; }
+}
+
+/* ------------------------------ ≤ 840px ---------------------------------- */
+@media (max-width: 840px) {
+
+  /* Roadmap timeline becomes vertical */
+  .timeline { grid-template-columns: 1fr; gap: 12px; }
+  .timeline::before {
+    top: 10px; bottom: 10px; left: 26px; right: auto;
+    width: 3px; height: auto;
+    background: linear-gradient(180deg, var(--primary) var(--tl-progress), var(--border) var(--tl-progress));
+  }
+  .tl-node { flex-direction: row; align-items: center; gap: 15px; text-align: left; }
+  .tl-dot { width: 46px; height: 46px; flex-shrink: 0; }
+  .tl-num { display: none; }
+  .tl-title { text-align: left; font-size: 0.92rem; }
+}
+
+/* ------------------------------ ≤ 768px ---------------------------------- */
+@media (max-width: 768px) {
+
+  .container { padding: 0 18px; }
+  .section { padding: 56px 0; }
+  .section-head { margin-bottom: 30px; }
+
+  /* Collapsible filters */
+  .filters-toggle { display: inline-flex; }
+  .filters-panel { display: none; }
+  .filters-panel.open { display: grid; animation: cardIn 0.3s ease both; }
+  .res-filters { display: grid; } /* resource category chips stay visible but compact */
+
+  .explorer-bar { flex-direction: column; align-items: stretch; }
+  .bar-right { width: 100%; }
+  .bar-right .select { flex: 1; }
+  .search-box { flex-basis: auto; }
+
+  .cards-grid { grid-template-columns: 1fr; gap: 16px; }
+  .quiz-options { grid-template-columns: 1fr; }
+
+  .match-row {
+    display: grid; grid-template-columns: 42px 1fr auto;
+    gap: 4px 12px; align-items: center;
+  }
+  .match-row > .btn { grid-column: 1 / -1; width: 100%; margin-top: 6px; }
+  .match-score { text-align: right; }
+
+  .hero { padding: 48px 0 64px; }
+  .net-body { height: 350px; }
+
+  .cta-band { padding: 44px 24px; }
+
+  .modal-overlay { padding: 12px; }
+  .modal { max-height: 92vh; border-radius: 18px; }
+  .modal-head { padding: 16px 18px 13px; }
+  .modal-body { padding: 18px; }
+  .modal-footer { padding: 13px 18px; }
+
+  .toast-stack { right: 12px; left: 12px; top: calc(var(--nav-h) + 10px); }
+  .toast { max-width: none; }
+}
+
+/* ------------------------------ ≤ 620px ---------------------------------- */
+@media (max-width: 620px) {
+
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stat { padding: 22px 12px; }
+  .stat-icon { width: 40px; height: 40px; font-size: 1rem; }
+
+  .form-row { grid-template-columns: 1fr; }
+  .sup-stats { padding: 10px 6px; }
+  .saved-row { flex-direction: column; align-items: stretch; }
+  .saved-actions { justify-content: flex-end; }
+
+  .match-cta { padding: 20px; }
+  .match-cta .btn { width: 100%; }
+
+  .footer-grid { grid-template-columns: 1fr; gap: 26px; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; }
+
+  .cl-head { flex-direction: column; }
+  .cl-head > div { width: 100%; }
+}
+
+/* ------------------------------ ≤ 480px ---------------------------------- */
+@media (max-width: 480px) {
+
+  body { font-size: 0.95rem; }
+  .nav-inner { gap: 10px; }
+  .brand span.b { font-size: 1.02rem; }
+
+  .hero h1 { font-size: 2rem; }
+  .hero-cta .btn { width: 100%; }
+  .hero-note { font-size: 0.8rem; }
+
+  .net-body { height: 300px; }
+  .net-head { padding: 12px 14px; font-size: 0.62rem; letter-spacing: 0.12em; }
+  .net-foot { padding: 10px 14px; font-size: 0.62rem; }
+
+  .btn:not(.btn-sm) { width: 100%; }
+  .modal-footer .btn { flex: 1; }
+  .idea-foot { flex-direction: column; align-items: stretch; }
+  .idea-foot .btn { width: 100%; }
+  .sup-actions { flex-direction: column; align-items: stretch; }
+  .sup-actions .btn { width: 100%; }
+  .sup-actions .icon-btn { width: 100%; border: 1.5px solid var(--border); }
+
+  .filters-foot { flex-direction: column; align-items: stretch; }
+  .filters-foot-btns { justify-content: stretch; }
+  .filters-foot-btns .btn { flex: 1; }
+
+  .roadmap-panel { padding: 20px 18px; }
+  .checklist { padding: 20px 18px; }
+  .rp-head { flex-direction: column; }
+}
+
+/* ------------------------------ ≤ 380px ---------------------------------- */
+@media (max-width: 380px) {
+
+  .container { padding: 0 14px; }
+  .net-body { height: 272px; }
+  .stat-num { font-size: 1.7rem; }
+  .chip { padding: 6px 12px; font-size: 0.8rem; }
+  .count-badge { min-width: 17px; height: 17px; font-size: 0.62rem; }
+}
+
+/* ----------------------------- ≥ 1440px ----------------------------------- */
+@media (min-width: 1440px) {
+  .container { max-width: 1280px; }
+}
