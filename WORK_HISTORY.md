@@ -665,4 +665,68 @@ and a direct read of the tables with the service role.
 - Deploy to Vercel (GitHub → import → 3 env vars → deploy) and repeat the
   browser test on the live URL.
 
+## Session 4 - study document and the Vercel entry point
+
+**Goal:** one self-contained `iit-preparation.html` that explains the whole build
+(bilingual EN / Bangla), plus a deployment path that actually works.
+
+**1. Vercel entry point corrected**
+
+Vercel turns files in `api/` (or a few root names) into functions; it does not
+scan the `app/` package. Rather than hope, added a one-line shim:
+
+```python
+# api/index.py
+from app.main import app
+__all__ = ["app"]
+```
+
+`vercel.json` now declares `api/index.py` instead of `app/main.py`. Verified by
+importing it locally: `from api.index import app` exposes all **26** paths from
+`app.openapi()`. Local development is unchanged (`uvicorn app.main:app`).
+
+**2. `scripts/build_prep_doc.py` - the generator**
+
+Reads the real project files at build time (`code()` helper) so the embedded
+source cannot drift from the code. Output: **15 sections, 390 KB**, one `<style>`
+and one `<script>` block, **no external requests** - it opens by double-click.
+
+Sections: overview, architecture, build steps, database, backend files, API
+reference, auth, sync, verification, bugs, deploy, troubleshooting, viva (33
+Q&A), glossary (45 terms), limitations.
+
+**3. Bugs found while building the document**
+
+- Two Bengali words were replaced by Russian text during generation
+  ("короткие", "предложить"). Found with a Unicode script scan, fixed by
+  codepoint, then re-scanned: **0 Cyrillic characters**.
+- 28 prose quotes carried a stray backslash (`\"`) because the generator's
+  Python strings were double-escaped. Fixed at source; output now shows plain
+  quotes.
+- Scrollspy never highlighted anything: it observed `<h2>` boxes inside a
+  10%-tall IntersectionObserver band, so nothing ever intersected. Replaced
+  with a direct calculation (last heading above 20% of the viewport) on scroll
+  and `hashchange`.
+- Six line counts in the doc were wrong because `Measure-Object -Line` skips
+  blank lines. Recounted with Python and corrected (`api.js` 411 -> 486,
+  schema 310 -> 372, and others), and added `api/index.py` (22 lines).
+
+**4. Verification**
+
+- `py_compile` passes; `iit-preparation.html` regenerates cleanly.
+- 15 `<h2 id>` sections == 15 TOC links; 28 tables, 19 code blocks, 550
+  balanced `<code>` tags, 0 Cyrillic, 0 "File not found", 0 real secrets.
+- Browser (Chromium, `http://127.0.0.1:8418`): **zero console errors**;
+  EN / Bangla / Both toggle changes computed display and persists through
+  reload (`tb_prep_lang`); copy button falls back to "Select & Ctrl+C" when the
+  clipboard API is denied; scrollspy updates on a dispatched scroll event
+  (this automation environment suppresses native scroll events, so the visual
+  check was done by dispatch).
+
+**Next session**
+
+- Import the repo on Vercel, add the three env vars, deploy, then check
+  `/api/health` -> `databaseConfigured: true` and repeat the browser flow on
+  the live URL.
+
 <!-- Append new sessions below this line. -->
