@@ -633,7 +633,7 @@ def s_overview() -> str:
                 ("Database tables", "ডেটাবেস টেবিল", "16", "sql/001_create_tables.sql"),
                 ("Seeded content rows", "সিড করা কনটেন্ট রো", "150", "scripts/seed_supabase.py"),
                 ("API endpoints", "API endpoint", "26", "/docs (OpenAPI)"),
-                ("Backend Python files", "ব্যাকএন্ড Python ফাইল", "12", "app/ + api/ + scripts/"),
+                ("Backend Python files", "ব্যাকএন্ড Python ফাইল", "11", "app/ + scripts/"),
                 ("Automated API checks", "স্বয়ংক্রিয় API চেক", "57", "all passed, 0 failed"),
                 ("Real bugs fixed", "আসল বাগ", "3", "section 10"),
                 ("Website pages kept working", "সচল রাখা পেজ", "6", "public/*.html"),
@@ -697,7 +697,7 @@ def s_architecture() -> str:
 |  Vercel                      |                         |
 |                              |                         |
 |  /            -> public/     |                         |
-|  /api/...     -> api/index.py+-------------------------+
+|  /api/...     -> app/main.py +-------------------------+
 |                              |
 |  env vars: SUPABASE_URL,     |
 |            ANON_KEY,         |
@@ -717,8 +717,8 @@ def s_architecture() -> str:
                     "এরপর <code>api.js</code> পুরো লিস্ট আর <code>localStorage</code>-এর টোকেন নিয়ে <code>PUT /api/me/bookmarks/ideas</code> কল করে।",
                 ),
                 (
-                    "Vercel runs <code>api/index.py</code>, which imports the app from <code>app/main.py</code>. FastAPI matches the path, validates the JSON with a Pydantic model, and rejects bad input with 422 before any code runs.",
-                    "Vercel <code>api/index.py</code> চালায়, যা <code>app/main.py</code> থেকে অ্যাপ আমদানি করে। FastAPI পাথ মিলিয়ে, Pydantic মডেল দিয়ে JSON যাচাই করে, আর ভুল ইনপুটে কোড চলার আগেই 422 ফেরত দেয়।",
+                    "Vercel runs the FastAPI application itself, defined in <code>app/main.py</code>. FastAPI matches the path, validates the JSON with a Pydantic model, and rejects bad input with 422 before any code runs.",
+                    "Vercel নিজেই <code>app/main.py</code>-তে সংজ্ঞায়িত FastAPI অ্যাপ্লিকেশনটি চালায়। FastAPI পাথ মিলিয়ে, Pydantic মডেল দিয়ে JSON যাচাই করে, আর ভুল ইনপুটে কোড চলার আগেই 422 ফেরত দেয়।",
                 ),
                 (
                     "<code>dependencies.py</code> reads the <code>Authorization</code> header and asks Supabase Auth who the token belongs to. Invalid token → 401, and the route never runs.",
@@ -765,10 +765,8 @@ def s_architecture() -> str:
         + pre(
             """
 thesisbridge-bd/
-├── api/
-│   └── index.py            <- the function Vercel calls; re-exports `app`
 ├── app/                    <- the Python API (never served as files)
-│   ├── main.py             <- builds the FastAPI app, `app` lives here
+│   ├── main.py             <- builds the FastAPI app; Vercel enters here
 │   ├── config.py           <- reads environment variables
 │   ├── database.py         <- the two Supabase clients
 │   ├── dependencies.py     <- token checking for protected routes
@@ -1023,13 +1021,13 @@ def s_steps() -> str:
             para(
                 "<code>app/main.py</code> creates the FastAPI object, enables CORS, registers "
                 "the four routers under <code>/api</code>, and adds two friendly error "
-                "handlers. The object is named <code>app</code> because "
-                "<code>api/index.py</code> re-exports exactly that name for Vercel, so the label "
-                "is a contract rather than a preference.",
+                "handlers. The object is named <code>app</code> because Vercel looks for a "
+                "FastAPI instance with exactly that name in this file, so the label is a "
+                "contract rather than a preference.",
                 "<code>app/main.py</code> FastAPI অবজেক্ট বানায়, CORS চালু করে, চারটি রাউটার "
                 "<code>/api</code>-এর নিচে যোগ করে, আর দুটি বন্ধুত্বপূর্ণ এরর হ্যান্ডলার দেয়। "
-                "অবজেক্টের নাম <code>app</code> কারণ <code>api/index.py</code> ঠিক এই নামেই "
-                "Vercel-এর জন্য রি-এক্সপোর্ট করে, তাই নামটি পছন্দ নয়, চুক্তি।",
+                "অবজেক্টের নাম <code>app</code> কারণ Vercel এই ফাইলে ঠিক ওই নামের FastAPI "
+                "ইনস্ট্যান্স খোঁজে, তাই নামটি পছন্দ নয়, চুক্তি।",
             )
             + cmd(
                 r".\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000"
@@ -1284,7 +1282,6 @@ main.py           creates FastAPI, adds CORS, registers routers, error handlers
         + table(
             [("File", "ফাইল"), ("Lines", "লাইন"), ("Responsibility", "দায়িত্ব")],
             [
-                ("api/index.py", "22", ("The function Vercel calls; re-exports `app`", "Vercel যে ফাংশন কল করে; `app` রি-এক্সপোর্ট করে")),
                 ("app/main.py", "208", ("Builds the app, CORS, routers, health, error handlers", "অ্যাপ, CORS, রাউটার, হেলথ, এরর হ্যান্ডলার")),
                 ("app/config.py", "93", ("The only place that reads environment variables", "একমাত্র জায়গা যেখানে env পড়া হয়")),
                 ("app/database.py", "63", ("Two reusable Supabase clients", "দুটি পুনর্ব্যবহারযোগ্য Supabase ক্লায়েন্ট")),
@@ -2078,14 +2075,11 @@ GitHub repo  ──push──>  Vercel build  ──>  https://<project>.vercel.
                                           |
                         +-----------------+------------------+
                         |                                    |
-                   public/  ->  /                    api/index.py  ->  /api/*
-                   (static files)                    (one Python function)
-                                                             |
-                                                             v
-                                                    app/main.py (FastAPI)
-                                                             |
-                                                             v
-                                                   Supabase (Auth + PostgreSQL)
+                   public/  ->  /                     /api/*  ->  app/main.py
+                   (static files, served                (one Python function)
+                    from the CDN)                                 |
+                                                                  v
+                                                        Supabase (Auth + PostgreSQL)
 """
         )
         + h3("One-time setup — six steps", "একবারের সেটআপ — ছয় ধাপ")
@@ -2100,8 +2094,8 @@ GitHub repo  ──push──>  Vercel build  ──>  https://<project>.vercel.
                     "<b>vercel.com/new</b>-এ যান এবং <b>Import Git Repository</b> বেছে নিন। প্রথমবার GitHub অনুমোদন করে রিপোটি বেছে নিন।",
                 ),
                 (
-                    "In the import screen leave <b>Framework Preset</b> on <i>Other</i>, <b>Root Directory</b> on <code>./</code>, and both build fields empty. There is nothing to compile: Vercel serves <code>public/</code> and bundles the Python function by itself.",
-                    "ইমপোর্ট স্ক্রিনে <b>Framework Preset</b> <i>Other</i>-এ, <b>Root Directory</b> <code>./</code>-এ, আর দুটি build ঘর খালি রাখুন। কম্পাইল করার কিছু নেই: Vercel নিজেই <code>public/</code> সার্ভ করে আর Python ফাংশন বান্ডল করে।",
+                    "On the import screen the <b>Framework Preset</b> must be <b>FastAPI</b>. Vercel detects it from <code>fastapi</code> in <code>requirements.txt</code> plus the <code>app</code> object in <code>app/main.py</code>, and <code>vercel.json</code> pins the same value so the dropdown cannot change it. Leave <b>Root Directory</b> on <code>./</code> and both build fields empty: there is nothing to compile.",
+                    "ইমপোর্ট স্ক্রিনে <b>Framework Preset</b> অবশ্যই <b>FastAPI</b> হতে হবে। Vercel এটি শনাক্ত করে <code>requirements.txt</code>-এর <code>fastapi</code> আর <code>app/main.py</code>-এর <code>app</code> অবজেক্ট থেকে, এবং <code>vercel.json</code>-ও একই মান পিন করে রাখে তাই ড্রপডাউন তা বদলাতে পারে না। <b>Root Directory</b> <code>./</code>-এ আর দুটি build ঘর খালি রাখুন: কম্পাইল করার কিছু নেই।",
                 ),
                 (
                     "Open <b>Environment Variables</b> and add the three Supabase values from the table below. Tick all three environments (Production, Preview, Development) so a preview deploy also works.",
@@ -2141,20 +2135,20 @@ GitHub repo  ──push──>  Vercel build  ──>  https://<project>.vercel.
             [("File", "ফাইল"), ("Why it matters", "কেন দরকার")],
             [
                 (
-                    "<code>api/index.py</code>",
-                    ("The function entry point. Vercel only turns files inside <code>api/</code> (or a few root names) into functions, so this one-line file imports the real app from <code>app/main.py</code>.", "ফাংশনের প্রবেশদ্বার। Vercel শুধু <code>api/</code>-এর ভিতরের ফাইল (বা কয়েকটি রুট-নাম) ফাংশন বানায়, তাই এই এক-লাইনের ফাইল <code>app/main.py</code> থেকে আসল অ্যাপ আমদানি করে।"),
+                    "<code>app/main.py</code>",
+                    ("The application entry point. Vercel looks for a FastAPI object named <code>app</code> in <code>app/main.py</code>, <code>app.py</code>, <code>index.py</code>, <code>server.py</code>, <code>main.py</code>, <code>wsgi.py</code> or <code>asgi.py</code> — and <code>app/main.py</code> is one of those names. Every <code>/api/...</code> request reaches this single function.", "অ্যাপ্লিকেশনের প্রবেশদ্বার। Vercel <code>app/main.py</code>, <code>app.py</code>, <code>index.py</code>, <code>server.py</code>, <code>main.py</code>, <code>wsgi.py</code> বা <code>asgi.py</code>-তে <code>app</code> নামের FastAPI অবজেক্ট খোঁজে — আর <code>app/main.py</code> তাদের একটি। প্রতিটি <code>/api/...</code> রিকোয়েস্ট এই একটিমাত্র ফাংশনে পৌঁছায়।"),
                 ),
                 (
                     "<code>vercel.json</code>",
-                    ("Raises the function timeout to 30 seconds. The default is 10, which is tight for a cold start plus a Supabase round trip.", "ফাংশনের সময়সীমা ৩০ সেকেন্ড করে। ডিফল্ট ১০, যা কোল্ড স্টার্ট যোগ Supabase রাউন্ড ট্রিপের জন্য কম।"),
+                    ("Pins the framework to <code>fastapi</code> and raises the function timeout to 30 seconds. The default is 10, which is tight for a cold start plus a Supabase round trip.", "ফ্রেমওয়ার্ক <code>fastapi</code>-তে পিন করে আর ফাংশনের সময়সীমা ৩০ সেকেন্ড করে। ডিফল্ট ১০, যা কোল্ড স্টার্ট যোগ Supabase রাউন্ড ট্রিপের জন্য কম।"),
                 ),
                 (
                     "<code>requirements.txt</code>",
-                    ("Vercel installs exactly these five packages into the function. No version pinning beyond <code>&gt;=</code>, so a rebuild picks up patch fixes.", "Vercel ঠিক এই পাঁচটি প্যাকেজ ফাংশনে ইনস্টল করে। <code>&gt;=</code>-এর বাইরে ভার্সন পিন নেই, তাই রিবিল্ডে প্যাচ ঠিকানা পায়।"),
+                    ("Vercel installs these five packages into the function. No pinning beyond <code>&gt;=</code>, so a rebuild picks up patch fixes.", "Vercel এই পাঁচটি প্যাকেজ ফাংশনে ইনস্টল করে। <code>&gt;=</code>-এর বাইরে পিন নেই, তাই রিবিল্ডে প্যাচ ঠিকানা পায়।"),
                 ),
                 (
                     "<code>.python-version</code>",
-                    ("Asks for Python 3.14. If that runtime is not offered, the build fails loudly and the fix is to change this file to a supported version — see section 12.", "Python ৩.১৪ চায়। সেই রানটাইম না থাকলে বিল্ড স্পষ্টভাবে ব্যর্থ হয়, আর সমাধান হলো এই ফাইলটি সমর্থিত ভার্সনে বদলানো — section ১২ দেখুন।"),
+                    ("Pins Python 3.14, which Vercel offers (3.12 is the default, 3.13 and 3.14 are available). If a version were ever unsupported, Vercel would quietly use 3.12 instead of failing the build.", "Python ৩.১৪ পিন করে, যা Vercel দেয় (ডিফল্ট ৩.১২, ৩.১৩ ও ৩.১৪ পাওয়া যায়)। কোনো ভার্সন অসমর্থিত হলে Vercel বিল্ড ব্যর্থ না করে চুপচাপ ৩.১২ ব্যবহার করত।"),
                 ),
                 (
                     "<code>public/</code>",
@@ -2162,16 +2156,11 @@ GitHub repo  ──push──>  Vercel build  ──>  https://<project>.vercel.
                 ),
             ],
         )
-        + h3("The function entry point", "ফাংশনের প্রবেশদ্বার")
-        + code(
-            "api/index.py",
-            "api/index.py — the one-line bridge Vercel sees",
-            "api/index.py — Vercel যে এক-লাইনের সেতু দেখে",
-        )
+        + h3("The settings files", "সেটিংস ফাইল")
         + code(
             "vercel.json",
-            "vercel.json — the only project setting",
-            "vercel.json — একমাত্র প্রজেক্ট সেটিং",
+            "vercel.json — framework, entry point and timeout in one place",
+            "vercel.json — ফ্রেমওয়ার্ক, প্রবেশদ্বার ও সময়সীমা এক জায়গায়",
         )
         + code(
             "requirements.txt",
@@ -2360,13 +2349,13 @@ def s_troubleshoot() -> str:
                 ),
                 (
                     ("<code>404</code> · <code>{\"detail\":\"Not Found\"}</code> on every <code>/api/...</code>", "প্রতিটি <code>/api/...</code>-এ <code>৪০৪</code> · <code>{\"detail\":\"Not Found\"}</code>"),
-                    ("Vercel did not detect a function: <code>api/index.py</code> is missing or <code>vercel.json</code> points at the wrong path.", "Vercel ফাংশন শনাক্ত করেনি: <code>api/index.py</code> নেই বা <code>vercel.json</code> ভুল পাথে দেখাচ্ছে।"),
-                    ("Confirm the file exists in the repo and that <code>functions</code> names <code>api/index.py</code>. Redeploy.", "ফাইলটি রিপোতে আছে এবং <code>functions</code>-এ <code>api/index.py</code> লেখা আছে নিশ্চিত করুন। রিডিপ্লয় করুন।"),
+                    ("Vercel did not treat the project as a FastAPI app, so no function was created. That happens when <code>app/main.py</code> is not at the repo root, or when the framework was set to <i>Other</i> in the import screen.", "Vercel প্রজেক্টটিকে FastAPI অ্যাপ ধরেনি, তাই কোনো ফাংশন তৈরি হয়নি। এটি ঘটে যখন <code>app/main.py</code> রিপো-রুটে থাকে না, বা ইমপোর্ট স্ক্রিনে ফ্রেমওয়ার্ক <i>Other</i> সেট থাকে।"),
+                    ("Confirm <code>app/main.py</code> sits at the root of the repo and that <code>vercel.json</code> says <code>\"framework\": \"fastapi\"</code> with <code>functions</code> keyed <code>app/main.py</code>. Redeploy.", "নিশ্চিত করুন <code>app/main.py</code> রিপোর রুটে আছে এবং <code>vercel.json</code>-এ <code>\"framework\": \"fastapi\"</code> আর <code>functions</code>-এ <code>app/main.py</code> লেখা আছে। রিডিপ্লয় করুন।"),
                 ),
                 (
                     ("The HTML pages return 404 but <code>/api/health</code> works", "HTML পেজ ৪০৪ কিন্তু <code>/api/health</code> কাজ করে"),
-                    ("Vercel is not treating <code>public/</code> as the static output.", "Vercel <code>public/</code>-কে স্ট্যাটিক আউটপুট ধরছে না।"),
-                    ("In Project Settings set <b>Output Directory</b> to <code>public</code>, or add <code>\"outputDirectory\": \"public\"</code> to <code>vercel.json</code>.", "Project Settings-এ <b>Output Directory</b> <code>public</code> করুন, বা <code>vercel.json</code>-এ <code>\"outputDirectory\": \"public\"</code> যোগ করুন।"),
+                    ("Vercel is not serving the static folder at the domain root. With the FastAPI preset, a <code>public/</code> directory at the repo root is published to the CDN automatically; anything else is left out of the deployment.", "Vercel স্ট্যাটিক ফোল্ডার ডোমেইন রুটে সার্ভ করছে না। FastAPI প্রিসেটে রিপো-রুটের <code>public/</code> ফোল্ডার স্বয়ংক্রিয়ভাবে CDN-এ যায়; অন্য কিছু ডিপ্লয়মেন্টে বাদ পড়ে।"),
+                    ("Check that the folder is named exactly <code>public</code>, at the repo root, with <code>index.html</code> inside it. Redeploy.", "ফোল্ডারের নাম হুবহু <code>public</code>, রিপো-রুটে, ভিতরে <code>index.html</code> — তা যাচাই করে রিডিপ্লয় করুন।"),
                 ),
                 (
                     ("Build log: <i>ModuleNotFoundError: No module named 'app'</i>", "বিল্ড লগ: <i>ModuleNotFoundError: No module named 'app'</i>"),
@@ -2374,9 +2363,9 @@ def s_troubleshoot() -> str:
                     ("Set Root Directory back to <code>./</code>.", "Root Directory আবার <code>./</code> করুন।"),
                 ),
                 (
-                    ("Build log: unsupported Python version", "বিল্ড লগ: unsupported Python version"),
-                    ("<code>.python-version</code> asks for 3.14 and this Vercel runtime does not offer it.", "<code>.python-version</code> ৩.১৪ চায় আর এই Vercel রানটাইম তা দেয় না।"),
-                    ("Change the file to a supported version such as <code>3.13</code>, then redeploy. Nothing in the code needs 3.14.", "ফাইলটি <code>3.13</code>-এর মতো সমর্থিত ভার্সনে বদলে রিডিপ্লয় করুন। কোডে ৩.১৪-নির্ভর কিছু নেই।"),
+                    ("Build log: unknown framework, or the deploy stops before bundling", "বিল্ড লগ: unknown framework, বা বান্ডল হওয়ার আগেই ডিপ্লয় থেমে যায়"),
+                    ("The <code>\"framework\"</code> value in <code>vercel.json</code> was edited to something Vercel does not know.", "কেউ <code>vercel.json</code>-এর <code>\"framework\"</code> মান এমন কিছুতে বদলেছে যা Vercel চেনে না।"),
+                    ("Restore <code>\"framework\": \"fastapi\"</code>, or delete that line entirely — Vercel detects FastAPI on its own from <code>requirements.txt</code>.", "<code>\"framework\": \"fastapi\"</code> ফিরিয়ে আনুন, অথবা লাইনটি পুরো মুছে দিন — Vercel নিজেই <code>requirements.txt</code> থেকে FastAPI শনাক্ত করে।"),
                 ),
                 (
                     ("First request takes about a second", "প্রথম রিকোয়েস্টে প্রায় এক সেকেন্ড লাগে"),

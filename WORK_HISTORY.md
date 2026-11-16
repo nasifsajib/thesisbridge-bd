@@ -729,4 +729,75 @@ Q&A), glossary (45 terms), limitations.
   `/api/health` -> `databaseConfigured: true` and repeat the browser flow on
   the live URL.
 
+## Session 5 - correcting the Vercel entry point (reversal)
+
+**Why this session exists:** Session 4 added `api/index.py` as a one-line shim
+on the belief that "Vercel only turns files in `api/` into functions, so
+`app/main.py` is never detected". That belief is wrong for the current Python
+runtime, and acting on it would have made the first deploy unreliable.
+
+**What the official docs actually say (checked, not remembered)**
+
+- `vercel.com/docs/frameworks/backend/fastapi` lists the FastAPI entrypoints as
+  `app.py`, `index.py`, `server.py`, `main.py`, `wsgi.py`, `asgi.py` **and the
+  same filenames inside `src/` or `app/`**. So `app/main.py` is a first-class
+  entrypoint.
+- `vercel.com/docs/functions/runtimes/python/api-directory` states: *"A Python
+  framework preset takes precedence over file-based functions. When Vercel
+  detects a framework preset, the framework application handles all requests,
+  and files under `/api` don't become separate Vercel Functions."*
+- The same FastAPI page says a root `public/` directory is published to the CDN
+  at matching root paths, and explicitly says **not** to `app.mount()` it.
+
+Consequence: with both `app/main.py` and `api/index.py` present, the preset wins
+and `functions: {"api/index.py": ...}` names a function that does not exist —
+a plausible build-time failure on the very first deploy.
+
+- Also checked `vercel.com/docs/functions/runtimes/python/python-version`:
+  supported versions are **3.12 (default), 3.13, 3.14**, and an unsupported
+  version silently falls back to 3.12 instead of failing the build. The earlier
+  doc text claiming 3.14 would "fail loudly" was wrong and was rewritten.
+
+**What changed**
+
+1. Deleted `api/index.py` and the now-empty `api/` folder.
+2. `vercel.json`: `functions` now keyed by the real entrypoint, plus an explicit
+   framework pin so the import-screen dropdown cannot break routing:
+   ```json
+   { "framework": "fastapi", "functions": { "app/main.py": { "maxDuration": 30 } } }
+   ```
+   `framework` accepts 75 documented values; `fastapi` was confirmed present in
+   the published schema (`openapi.vercel.sh/vercel.json`), not assumed.
+3. `requirements.txt`: `uvicorn[standard]` -> `uvicorn`. On Vercel the app is run
+   by the platform, so uvicorn is local-only; dropping the extras removes
+   uvloop / httptools / watchfiles, three compiled extensions that would have to
+   have a wheel for the chosen Python version or the build would try to compile
+   them. Comments in the file say exactly this.
+4. `SETUP.md`: `vercel.json` row now mentions the framework pin.
+5. `scripts/build_prep_doc.py`: removed all 12 `api/index.py` references
+   (architecture diagram, request walkthrough, step 10, file map, deploy
+   section, troubleshooting), fixed the `.python-version` claim, replaced the
+   stale "Framework Preset: Other" instruction with **FastAPI**, and replaced
+   the obsolete "unsupported Python version" troubleshooting row with the two
+   failures this configuration can actually produce.
+
+**Verification**
+
+- `from app.main import app` -> **26 endpoints**, unchanged.
+- App imports cleanly with all three Supabase variables emptied, so nothing
+  crashes at import time on a cold start.
+- Regenerated document: **15 sections**, 396 KB, 18 code blocks, 28 tables,
+  577 balanced `<code>` tags, **0** `api/index.py` mentions, 0 Cyrillic,
+  0 stray backslashes, 0 real keys.
+
+**Honest note for the viva:** Session 4's shim was a plausible design based on
+outdated knowledge; Session 5 removed it after reading the current docs. The
+reason it is worth recording is that the wrong version would have failed on the
+first deploy, not later.
+
+**Next session**
+
+- Import the repo on Vercel with Framework Preset **FastAPI**, add the three env
+  vars, deploy, then run the four checks and the browser flow on the live URL.
+
 <!-- Append new sessions below this line. -->

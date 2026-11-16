@@ -6,7 +6,11 @@
 # working with newer releases and with newer Python versions.
 
 fastapi>=0.115
-uvicorn[standard]>=0.30
+# `uvicorn` is for local development only; Vercel runs the app with its own
+# server. The extra packages in `uvicorn[standard]` (uvloop, httptools,
+# watchfiles) are compiled extensions, so leaving them out keeps the Vercel
+# build pure-Python and fast.
+uvicorn>=0.30
 supabase>=2.11
 python-dotenv>=1.0
 pydantic[email]>=2.8

@@ -393,7 +393,7 @@ Supabase `profiles` table.
 | `public/` | Vercel serves this folder at `/` (HTML, CSS, JS, images). |
 | `requirements.txt` | Vercel installs these packages before building the function. |
 | `.python-version` | pins Python 3.14. |
-| `vercel.json` | gives the function `maxDuration: 30` seconds (Supabase calls can be slow). |
+| `vercel.json` | pins the framework to `fastapi` and gives the function `maxDuration: 30` seconds (Supabase calls can be slow). |
 
 `js/api.js` uses a **relative** URL in production (`"" + "/api/content"`), so
 the same code works locally and on Vercel without any change.
