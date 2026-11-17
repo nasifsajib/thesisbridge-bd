@@ -14,10 +14,11 @@ Supabase Auth signs the token, and `auth.get_user(token)` verifies it with
 Supabase. That means we do not have to write our own JWT secret management.
 """
 
-from fastapi import Header, HTTPException, status
+from fastapi import Depends, Header, HTTPException, status
+from postgrest.exceptions import APIError
 
 from app.config import ConfigurationError
-from app.database import get_auth_client
+from app.database import get_admin_client, get_auth_client
 
 
 def _extract_token(authorization: str | None) -> str | None:
@@ -88,6 +89,62 @@ def get_current_user(authorization: str | None = Header(default=None)) -> dict:
         "email": supabase_user.email,
         "token": token,
     }
+
+
+def require_admin(current_user: dict = Depends(get_current_user)) -> dict:
+    """
+    FastAPI dependency for ADMIN-ONLY routes.
+
+    Usage inside a router:
+
+        @router.get("/overview")
+        def overview(admin: dict = Depends(require_admin)):
+            ...
+
+    How it works:
+      1. `get_current_user` already proved the token is valid (else 401).
+      2. We read the `is_admin` flag of that user's profile row.
+      3. A normal student gets 403 Forbidden - the request is refused by the
+         SERVER, not merely hidden by the page. Typing /admin.html by hand
+         therefore shows nothing useful: every call behind this dependency
+         answers 403.
+
+    The flag is read from the database on every admin request instead of being
+    trusted from the token, so revoking admin access takes effect immediately
+    and cannot be forged by editing a token on the client.
+    """
+    db = get_admin_client()
+
+    try:
+        rows = (
+            db.table("profiles")
+            .select("is_admin")
+            .eq("id", current_user["id"])
+            .limit(1)
+            .execute()
+            .data
+        )
+    except APIError as exc:
+        # A fresh copy of the project may not have run sql/002_admin.sql yet.
+        # Say that in plain words instead of "column profiles.is_admin missing".
+        if exc.code == "42703":
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=(
+                    "The administrator flag is missing from the database. "
+                    "Open the Supabase dashboard, go to SQL Editor, and run "
+                    "sql/002_admin.sql once."
+                ),
+            )
+        raise
+
+    if not rows or not rows[0].get("is_admin"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrator access is required for this page.",
+        )
+
+    return current_user
 
 
 def get_optional_user(authorization: str | None = Header(default=None)) -> dict | None:

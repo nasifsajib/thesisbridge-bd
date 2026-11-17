@@ -536,6 +536,11 @@ window.TB = window.TB || {};
     if (wrap) {
       if (u) {
         wrap.innerHTML =
+          // Admin link is cosmetic only: the server refuses /api/admin/* with
+          // 403 unless the profile's is_admin flag is true.
+          (u.isAdmin
+            ? '<a class="icon-btn" href="admin.html" title="Admin dashboard" aria-label="Admin dashboard"><i class="fa-solid fa-shield-halved"></i></a>'
+            : '') +
           '<button class="user-chip" data-auth="profile" title="View your profile">' +
           '  <span class="user-avatar">' + TB.esc(TB.initials(u.name)) + '</span>' +
           '  <span class="user-name">Hi, ' + TB.esc(u.name.split(' ')[0]) + '</span>' +
@@ -550,6 +555,9 @@ window.TB = window.TB || {};
     if (drawer) {
       drawer.innerHTML = u
         ? '<button class="btn btn-outline" data-auth="profile"><i class="fa-solid fa-user-graduate"></i> Hi, ' + TB.esc(u.name.split(' ')[0]) + '</button>' +
+          (u.isAdmin
+            ? '<a class="btn btn-outline" href="admin.html"><i class="fa-solid fa-shield-halved"></i> Admin dashboard</a>'
+            : '') +
           '<button class="btn btn-primary" data-auth="logout"><i class="fa-solid fa-right-from-bracket"></i> Log out</button>'
         : '<button class="btn btn-outline" data-auth="login">Login</button>' +
           '<button class="btn btn-primary" data-auth="signup">Get Started</button>';

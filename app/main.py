@@ -20,7 +20,7 @@ from fastapi.responses import JSONResponse
 from postgrest.exceptions import APIError
 
 from app.config import CORS_ORIGINS, ConfigurationError, missing_settings
-from app.routers import auth, content, requests, user_state
+from app.routers import admin, auth, content, requests, user_state
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("thesisbridge")
@@ -71,6 +71,9 @@ app.include_router(content.router, prefix="/api", tags=["Public content"])
 app.include_router(auth.router, prefix="/api/auth", tags=["Accounts"])
 app.include_router(user_state.router, prefix="/api/me", tags=["My data"])
 app.include_router(requests.router, prefix="/api", tags=["Connection requests"])
+# Admin routes are a separate prefix so the 403 rule lives in one place:
+# every path under /api/admin uses dependencies.require_admin.
+app.include_router(admin.router, prefix="/api/admin", tags=["Administrator"])
 
 
 # ===========================================================================

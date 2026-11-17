@@ -20,6 +20,7 @@ Two jobs:
 """
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, EmailStr, Field
 from pydantic.alias_generators import to_camel
@@ -225,6 +226,10 @@ class UserOut(CamelModel):
     department: str | None = None
     student_id: str | None = None
     interest: str | None = None
+    # False for every normal student. The browser uses it only to decide
+    # whether to show the "Admin" link; the real check happens on the server
+    # in dependencies.require_admin(), which answers 403 for non-admins.
+    is_admin: bool = False
 
 
 class AuthResponse(CamelModel):
@@ -321,3 +326,80 @@ class UserStateResponse(CamelModel):
     read_guide_ids: list[str]
     checklist_item_ids: list[str]
     connection_requests: list[ConnectionRequestOut]
+
+
+# ===========================================================================
+# 6. ADMIN MODELS (only reachable through dependencies.require_admin)
+# ===========================================================================
+
+
+class AdminTopIdea(CamelModel):
+    """One row of "most bookmarked ideas" - a simple popularity signal."""
+
+    id: int
+    title: str
+    bookmarks: int
+
+
+class AdminOverview(CamelModel):
+    """The four cards at the top of the admin dashboard."""
+
+    total_students: int
+    total_requests: int
+    pending_requests: int
+    accepted_requests: int
+    declined_requests: int
+    total_bookmarks: int
+    top_ideas: list[AdminTopIdea]
+
+
+class AdminStudent(CamelModel):
+    """
+    One student row in the admin table.
+
+    The five counters are computed by the admin router from the join tables,
+    so the page needs no extra requests.
+    """
+
+    id: str
+    name: str
+    email: str
+    university: str | None = None
+    department: str | None = None
+    student_id: str | None = None
+    joined_at: str | None = None
+    bookmarks: int = 0
+    saved_supervisors: int = 0
+    roadmap_steps: int = 0
+    read_guides: int = 0
+    checklist_items: int = 0
+    requests: int = 0
+
+
+class AdminConnectionRequest(CamelModel):
+    """
+    A connection request as the ADMIN sees it: every row, including guests,
+    with the supervisor's name resolved so the table is readable.
+    """
+
+    id: str
+    user_id: str | None = None
+    supervisor_id: int
+    supervisor_name: str | None = None
+    name: str
+    email: str
+    topic: str
+    message: str
+    status: str
+    date: str | None = None
+
+
+class AdminStatusUpdate(CamelModel):
+    """
+    Body of PUT /api/admin/connection-requests/{id}/status.
+
+    Literal[...] means Pydantic rejects anything else with HTTP 422, so the
+    status column can only ever hold these three words.
+    """
+
+    status: Literal["pending", "accepted", "declined"]
