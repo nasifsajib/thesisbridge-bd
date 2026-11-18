@@ -17,22 +17,27 @@ thesisbridge-bd/
 │   ├── main.py               ← creates the app, CORS, routers, /api/health
 │   ├── config.py             ← reads SUPABASE_URL / keys from .env
 │   ├── database.py           ← creates the two Supabase clients
-│   ├── dependencies.py       ← "who is logged in?" helper for protected routes
+│   ├── dependencies.py       ← "who is logged in?" + "is that user an admin?"
 │   ├── schemas.py            ← Pydantic models = shape of JSON in and out
 │   └── routers/
 │       ├── content.py        ← public content endpoints
 │       ├── auth.py           ← signup / login / me
 │       ├── user_state.py     ← bookmarks, roadmap, checklist, profile
-│       └── requests.py       ← "connect with a supervisor" requests
+│       ├── requests.py       ← "connect with a supervisor" requests
+│       └── admin.py          ← dashboard data (administrators only)
 │
 ├── public/                   ← the original website (HTML, CSS, JS, assets)
 │   ├── index.html            ← Vercel serves this folder at "/"
+│   ├── admin.html            ← NEW: administrator dashboard page
 │   ├── js/api.js             ← NEW: the bridge between the pages and the API
+│   ├── js/admin.js           ← NEW: dashboard logic (works without main.js)
 │   ├── js/main.js            ← login/signup now call TB.auth.*
 │   └── ...                   ← research/supervisors/publication/resources/about
 │
 ├── sql/001_create_tables.sql ← paste this in the Supabase SQL Editor
+├── sql/002_admin.sql         ← adds the is_admin flag (paste after 001)
 ├── scripts/seed_supabase.py  ← fills the content tables from seed/content.json
+├── scripts/create_admin.py   ← creates the administrator account
 ├── seed/content.json         ← the exact sample content exported from js/data.js
 │
 ├── requirements.txt          ← Python packages
@@ -107,7 +112,18 @@ It also:
 The file can be run again safely: it uses `create table if not exists` and
 drops each policy before recreating it.
 
-### 2.3 Email confirmation
+### 2.3 Add the administrator flag
+
+The dashboard needs one extra column on `profiles` that `001` does not have.
+
+1. **SQL Editor → New query** again.
+2. Open `sql/002_admin.sql`, copy all of it, paste and **Run**.
+3. `Success. No rows returned` means the column and its index now exist.
+
+The file only adds `profiles.is_admin boolean not null default false` and a
+partial index on the rows where it is true. It changes no existing data.
+
+### 2.4 Email confirmation
 
 Sign-up in this project uses the Supabase **admin API** with
 `email_confirm=True`, so a new account is usable immediately. You do **not**
@@ -204,7 +220,32 @@ Done. Every content table is ready.
 The script uses `upsert`, so running it twice does not create duplicates and
 never touches user tables.
 
-### 3.5 Start the API
+### 3.5 Create the administrator account
+
+Once `.env` is filled in (step 3.3) and the flag exists (step 2.3):
+
+```powershell
+.\.venv\Scripts\python.exe scripts\create_admin.py --password "choose-a-strong-password"
+```
+
+Expected output:
+
+```
+  created auth user   admin@thesisbridge.bd
+  profile flagged     is_admin = true
+
+Administrator ready: admin@thesisbridge.bd
+Password is stored hashed in Supabase Auth (not in any file).
+Sign in at /admin.html
+```
+
+Why a script and not a password written in the code: the repository can be
+read by anyone. This creates a **real Supabase Auth user** — the password
+exists only as a bcrypt hash inside `auth.users`, exactly like a student's.
+Running the same command again with a new `--password` changes it. The email
+can be changed with `--email`.
+
+### 3.6 Start the API
 
 ```powershell
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
@@ -216,7 +257,7 @@ Open these two URLs:
 - <http://127.0.0.1:8000/docs> → interactive documentation; you can click
   **Try it out** on every endpoint (great for a live demo).
 
-### 3.6 Start the website (second terminal)
+### 3.7 Start the website (second terminal)
 
 ```powershell
 cd "D:\web dev\thesisbridge-bd"
@@ -232,7 +273,7 @@ localhost, so both servers must be running at the same time.
 > still `http://127.0.0.1:8000`, but some browsers block `fetch` from `file://`.
 > Using `http.server` above avoids that problem.
 
-### 3.7 Test that it really works
+### 3.8 Test that it really works
 
 1. Open the site → **Get Started** → create an account.
 2. The navbar should greet you by your first name.
@@ -242,6 +283,10 @@ localhost, so both servers must be running at the same time.
    there.
 5. Log out, log in again, or open the site on another browser: the saved data
    comes back, because it is now in the database, not in the browser.
+6. Open <http://127.0.0.1:8417/admin.html>, sign in with the administrator
+   account, and check the four cards, the student table and the request inbox.
+   Sign in with a **student** account instead and the page must answer
+   "This account is not an administrator."
 
 ---
 
@@ -321,6 +366,27 @@ stores their `user_id`, so the request appears in `GET /api/me/connection-reques
 `js/api.js` compares the old and new arrays and sends only the difference
 (POST for a new supervisor, DELETE when withdrawn).
 
+### 4.6 How the administrator dashboard is protected
+
+The rule is kept in **one place**, the database column `profiles.is_admin`:
+
+```
+request  ──►  get_current_user()      reads the Bearer token, asks Supabase
+          ──►  require_admin()        SELECT is_admin FROM profiles WHERE id = user.id
+          ──►  router                 runs only when that value is true
+```
+
+- No token → **401**. A real student → **403**. The column missing → **503**
+  with the sentence "run sql/002_admin.sql", not a cryptic error.
+- `admin.js` also checks `user.isAdmin` before drawing the dashboard, but that
+  is only so a student sees a friendly message. Deleting that check would not
+  open the data, because Python enforces the rule on every request.
+- There are no extra RLS policies for the dashboard: the API already talks to
+  Supabase with the **service-role key**, which bypasses RLS. Adding a second
+  set of rules would mean two places to keep correct.
+- `ProfileUpdate` (the schema students can send) has no `is_admin` field, so a
+  student cannot promote themselves by editing their profile.
+
 ---
 
 ## 5. Deploy on Vercel
@@ -379,11 +445,14 @@ Click **Deploy**. When it finishes, open:
 | URL | Expected |
 | --- | --- |
 | `https://your-project.vercel.app/` | the website |
+| `https://your-project.vercel.app/admin.html` | the administrator sign-in gate |
 | `https://your-project.vercel.app/api/health` | `"databaseConfigured": true` |
-| `https://your-project.vercel.app/docs` | API documentation |
+| `https://your-project.vercel.app/docs` | API documentation (30 endpoints) |
 
 Then create an account on the live site and confirm the row appears in the
-Supabase `profiles` table.
+Supabase `profiles` table. The administrator account is created once from your
+computer with `scripts/create_admin.py` (step 3.5); it works on the live site
+immediately because it is a normal Supabase Auth user.
 
 ### 5.5 What makes Vercel work here
 
@@ -438,12 +507,22 @@ Needs `Authorization: Bearer <token>`:
 | GET | `/api/me/connection-requests` | my requests |
 | DELETE | `/api/me/connection-requests/{supervisor_id}` | withdraw one request |
 
+Needs `Authorization: Bearer <token>` **and** `profiles.is_admin = true`:
+
+| Method | Path | What it does |
+| --- | --- | --- |
+| GET | `/api/admin/overview` | counts + most-bookmarked ideas |
+| GET | `/api/admin/students` | every student with activity counts |
+| GET | `/api/admin/connection-requests?status=` | inbox, optionally filtered by `pending` / `accepted` / `declined` |
+| PUT | `/api/admin/connection-requests/{id}/status` | set a request to `pending`, `accepted` or `declined` |
+
 Errors use normal HTTP status codes and a `detail` message:
 
 | Code | Meaning in this project |
 | --- | --- |
 | 400 | one of the ids you sent does not exist |
 | 401 | missing / expired token, or wrong email + password |
+| 403 | a valid token, but that account is not an administrator |
 | 404 | record not found |
 | 409 | that email already has an account |
 | 422 | a field is missing or invalid (FastAPI validation) |
@@ -475,5 +554,7 @@ Errors use normal HTTP status codes and a `detail` message:
    this project, so the supervisor's email address is shown in the form.
 3. **The matching quiz still runs in the browser.** It is a scoring formula
    over the supervisor data, and the UI labels it as a demo recommendation.
-4. **No admin panel.** Content is changed with SQL or by re-running the seeder.
+4. **The administrator dashboard can read and triage, not edit.** It shows every
+   student and lets you set a connection request to accepted or declined, but
+   changing ideas, supervisors or guides still means SQL or the seeder.
 5. **Supabase's free plan** pauses inactive projects and has storage limits.

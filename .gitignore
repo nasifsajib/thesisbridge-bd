@@ -17,3 +17,13 @@ venv/
 # OS noise.
 .DS_Store
 Thumbs.db
+
+# Study and presentation material. These are personal deliverables, not part
+# of the deployed site, so they stay on this machine and never go to GitHub
+# or Vercel. The generator (scripts/build_prep_doc.py) is still tracked.
+DEFENCE-GUIDE.html
+PRESENTATION-PROMPT.md
+iit-preparation.html
+
+# Local server output from manual testing.
+*.log

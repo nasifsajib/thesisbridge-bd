@@ -4,6 +4,8 @@
 
 A fully interactive, responsive research hub for Bangladeshi undergraduate students — thesis idea discovery, supervisor matching, research methodology, and journal publication guidance. The interface is **HTML5, CSS3 and vanilla JavaScript** with no build step, and the content, accounts and saved data are served by a **Python (FastAPI) backend with a Supabase PostgreSQL database**.
 
+> 🌐 **Live:** <https://thesisbridge-bd.vercel.app> — the site, the API and the administrator dashboard (`/admin.html`) run together on that one domain.
+
 > 🆕 **Backend:** see [`SETUP.md`](SETUP.md) for installation and Vercel deployment, and [`WORK_HISTORY.md`](WORK_HISTORY.md) for a step-by-step record of the backend work.
 
 > 📑 This README is in **two languages**: [English](#-english) first, then [বাংলা](#-বাংলা).
@@ -24,7 +26,7 @@ ThesisBridge BD solves a real student problem: finding a thesis idea, a supervis
 
 It is a **full-stack application**: the pages are still plain HTML/CSS/JS, but the content is loaded from a Python API (`GET /api/content`), accounts are handled by Supabase Auth, and bookmarks, roadmap progress, checklist ticks and connection requests are stored in Supabase PostgreSQL. `js/data.js` stays in the project as an offline fallback, so the site still renders if the API is not running.
 
-**Inside the prototype:** 20 research ideas · 12 supervisor profiles · 20 resources · 7 publication guides · 8 roadmap steps · 8 FAQs · 6 pages · 16 database tables · 26 API endpoints.
+**Inside the prototype:** 20 research ideas · 12 supervisor profiles · 20 resources · 7 publication guides · 8 roadmap steps · 8 FAQs · 6 pages · 16 database tables · 30 API endpoints · 1 administrator dashboard.
 
 ## 2. Technologies
 
@@ -50,9 +52,9 @@ thesisbridge-bd/
 │   ├── main.py               → creates the app, CORS, routers, /api/health
 │   ├── config.py             → reads Supabase settings from .env
 │   ├── database.py           → the two Supabase clients
-│   ├── dependencies.py       → verifies the Bearer token
+│   ├── dependencies.py       → verifies the Bearer token + `require_admin()`
 │   ├── schemas.py            → Pydantic models (request/response shapes)
-│   └── routers/              → content · auth · user_state · requests
+│   └── routers/              → content · auth · user_state · requests · admin
 ├── public/                   → ★ the website served at "/"
 │   ├── index.html            → Home (hero, stats, explorer, matching, roadmap, FAQ)
 │   ├── research.html         → Full-page Research Idea Explorer
@@ -61,6 +63,7 @@ thesisbridge-bd/
 │   ├── resources.html        → Resource library
 │   ├── about.html            → Mission, how-it-works, FAQ
 │   ├── docs.html             → ★ Bilingual project documentation (not linked in the site)
+│   ├── admin.html            → ★ Administrator dashboard (login gate + 3 tables)
 │   ├── css/
 │   │   ├── style.css         → Design system: themes, components, modals, toasts
 │   │   └── responsive.css    → Breakpoints (mobile → 1440px desktop)
@@ -68,6 +71,7 @@ thesisbridge-bd/
 │   │   ├── data.js           → offline fallback content
 │   │   ├── api.js            → ★ NEW: connects pages to the Python API
 │   │   ├── main.js           → Core: state, toasts, modal system, theme, navbar, auth
+│   │   ├── admin.js          → ★ standalone dashboard logic (no main.js needed)
 │   │   ├── network.js        → Hero "Research Network" (draggable SVG graph + physics)
 │   │   ├── research.js       → Idea explorer logic
 │   │   ├── supervisors.js    → Supervisor logic + matching quiz
@@ -75,7 +79,9 @@ thesisbridge-bd/
 │   │   └── resources.js      → Resource library logic
 │   └── assets/icons/         → Logo + favicon (SVG)
 ├── sql/001_create_tables.sql → 16 tables + indexes + RLS policies
+├── sql/002_admin.sql         → adds profiles.is_admin + partial index
 ├── scripts/seed_supabase.py  → fills content tables from seed/content.json
+├── scripts/create_admin.py   → creates/repairs the administrator account
 ├── seed/content.json         → exact sample content exported from js/data.js
 ├── requirements.txt          → Python packages
 ├── .env.example              → copy to .env, add your Supabase keys
@@ -199,6 +205,19 @@ All colors are CSS variables; dark mode swaps one attribute (`data-theme="dark"`
 ### 4.13 Toasts + one reusable modal system
 All dialogs (idea details, supervisor profile, guides, resources, login, sign-up, saved panels) share one modal function: open animation, X, outside-click, Escape, stacked modals, focus return, scroll lock. Toasts auto-dismiss after ~3.4s.
 
+### 4.14 Administrator dashboard (`/admin.html`)
+A separate page for the site owner: four summary cards, the full student table with per-student activity counts, and the connection-request inbox with **Accept** / **Decline** buttons. It loads only for an account whose `profiles.is_admin` flag is true; every `/api/admin/*` route answers **403** for anyone else.
+
+```js
+// admin.js asks who the token belongs to, then decides what to show
+api('/api/auth/me').then(function (user) {
+  if (user.isAdmin) showDashboard(user);   // 4 cards + 3 tables
+  else { clearToken(); showGate('This account is not an administrator.'); }
+});
+```
+
+That browser check is only cosmetic. The actual protection is `require_admin()` in Python, which reads `is_admin` from the database on every request — so typing `/admin.html` by hand shows a login gate and nothing else. Accepting a request finally writes to the `connection_requests.status` column that the student-facing pages never touch.
+
 ## 5. The two "data doors" (now connected to the backend)
 
 Every piece of content is read from `js/data.js` *or* from the API, and every
@@ -251,6 +270,8 @@ python -m http.server 8417 --directory public
 Open <http://127.0.0.1:8417/index.html>. Interactive API documentation:
 <http://127.0.0.1:8000/docs>. If the API is not running, the site still renders
 from `js/data.js` (offline fallback) but login and saving are disabled.
+The administrator dashboard lives at <http://127.0.0.1:8417/admin.html>;
+create its account once with `python scripts/create_admin.py` (see `SETUP.md`).
 
 ## 7. Testing performed
 
@@ -263,14 +284,16 @@ from `js/data.js` (offline fallback) but login and saving are disabled.
 - 57 automated API checks against the live Supabase project, all passing: content counts, sign-up, token-protected routes (401 without a token), all five saved lists, partial profile updates, connection requests (member and guest), login round trip, validation (422) and the database rows themselves.
 - Full browser run on the real database: sign-up → bookmark → roadmap → checklist → delete the local copies → reload → data restored from PostgreSQL → logout → login → connection request.
 - **Real bugs found & fixed:** a FAQ field-name mismatch (`question`/`answer` in PostgreSQL vs `q`/`a` in the browser), and database errors escaping as an unreadable 500 instead of a 503 with instructions.
+- **Administrator dashboard:** 47 local checks and 32 live checks — 401 without a token, 403 for a normal student on all four admin routes, the overview/student/inbox shapes, the status filter, `pending → accepted`, a typo status rejected with 422, an unknown id answered with 404, then every test row and test account deleted and the database verified back to zero.
 
 ## 8. Limitations & future plan
 
 Access tokens last one hour (no refresh rotation) · connection requests are
 stored but not emailed (no SMTP) · the matching score runs in the browser ·
-no admin panel yet · Supabase's free plan pauses inactive projects.
-**Next phase:** an admin dashboard for content and requests, email
-notifications, and refresh-token handling.
+the admin dashboard can read data and change a request's status, but cannot
+edit content yet · Supabase's free plan pauses inactive projects.
+**Next phase:** content editing inside the admin dashboard, an email when a
+request arrives, and refresh-token handling.
 
 ---
 
@@ -286,8 +309,10 @@ ThesisBridge BD একটা বাস্তব সমস্যার সমা�
 
 এটি একটি **সম্পূর্ণ ফুল-স্ট্যাক অ্যাপ্লিকেশন**: পেজগুলো আগের মতোই সাধারণ HTML/CSS/JS, কিন্তু কনটেন্ট আসে Python API (`GET /api/content`) থেকে, অ্যাকাউন্ট সামলায় Supabase Auth, আর বুকমার্ক, রোডম্যাপ প্রোগ্রেস, চেকলিস্ট ও কানেকশন রিকোয়েস্ট জমা থাকে Supabase PostgreSQL-এ। `js/data.js` ফলব্যাক হিসেবে থাকে, তাই API বন্ধ থাকলেও সাইট দেখা যায়।
 
-**ভেতরে আছে:** ২০টি রিসার্চ আইডিয়া · ১২টি সুপারভাইজার প্রোফাইল · ২০টি রিসোর্স · ৭টি পাবলিকেশন গাইড · ৮ ধাপের রোডম্যাপ · ৮টি FAQ · ৬টি পেজ · ১৬টি ডেটাবেস টেবিল · ২৬টি API endpoint।
+**ভেতরে আছে:** ২০টি রিসার্চ আইডিয়া · ১২টি সুপারভাইজার প্রোফাইল · ২০টি রিসোর্স · ৭টি পাবলিকেশন গাইড · ৮ ধাপের রোডম্যাপ · ৮টি FAQ · ৬টি পেজ · ১৬টি ডেটাবেস টেবিল · ৩০টি API endpoint · ১টি অ্যাডমিন ড্যাশবোর্ড।
 
+> 🌐 **লাইভ:** <https://thesisbridge-bd.vercel.app> — সাইট, API আর অ্যাডমিন ড্যাশবোর্ড (`/admin.html`) একই ডোমেইনে চলে।
+>
 > 🆕 **ব্যাকএন্ড:** ইনস্টল ও Vercel ডিপ্লয়মেন্টের জন্য [`SETUP.md`](SETUP.md), আর ব্যাকএন্ডের কাজের ধাপে ধাপে রেকর্ড [`WORK_HISTORY.md`](WORK_HISTORY.md)।
 
 ## ২. ব্যবহৃত টেকনোলজি
@@ -314,9 +339,9 @@ thesisbridge-bd/
 │   ├── main.py               → অ্যাপ, CORS, রাউটার, /api/health
 │   ├── config.py             → .env থেকে Supabase সেটিংস পড়ে
 │   ├── database.py           → দুইটি Supabase client
-│   ├── dependencies.py       → Bearer টোকেন যাচাই
+│   ├── dependencies.py       → Bearer টোকেন যাচাই + `require_admin()`
 │   ├── schemas.py            → Pydantic মডেল (request/response)
-│   └── routers/              → content · auth · user_state · requests
+│   └── routers/              → content · auth · user_state · requests · admin
 ├── public/                   → ★ "/" এ সার্ভ হওয়া ওয়েবসাইট
 │   ├── index.html            → হোম
 │   ├── research.html         → রিসার্চ আইডিয়া এক্সপ্লোরার
@@ -325,13 +350,16 @@ thesisbridge-bd/
 │   ├── resources.html        → রিসোর্স লাইব্রেরি
 │   ├── about.html            → পরিচিতি
 │   ├── docs.html             → দ্বিভাষিক ডকুমেন্টেশন (সাইটে লিংক নেই)
+│   ├── admin.html            → ★ অ্যাডমিন ড্যাশবোর্ড (লগইন গেট + ৩টি টেবিল)
 │   ├── css/                  → style.css + responsive.css
-│   ├── js/                   → data.js · api.js · main.js · network.js ·
-│   │                            research.js · supervisors.js ·
+│   ├── js/                   → data.js · api.js · main.js · admin.js ·
+│   │                            network.js · research.js · supervisors.js ·
 │   │                            publication.js · resources.js
 │   └── assets/icons/         → লোগো + ফেভিকন
 ├── sql/001_create_tables.sql → ১৬ টেবিল + index + RLS
+├── sql/002_admin.sql         → profiles.is_admin + আংশিক index
 ├── scripts/seed_supabase.py  → content টেবিল ভরে
+├── scripts/create_admin.py   → অ্যাডমিন অ্যাকাউন্ট তৈরি/মেরামত
 ├── seed/content.json         → js/data.js থেকে নেওয়া ডেটা
 ├── requirements.txt          → Python প্যাকেজ
 ├── .env.example              → কপি করে .env বানান
@@ -457,6 +485,19 @@ if (password2.value !== password.value) fieldError(password2, 'Passwords do not 
 ### ৪.১৩ টোস্ট + একটিই পুনর্ব্যবহারযোগ্য মডাল সিস্টেম
 সব ডায়ালগ (আইডিয়ার বিস্তারিত, সুপারভাইজার প্রোফাইল, গাইড, রিসোর্স, লগইন, সাইন-আপ, সেভড প্যানেল) একটি মডাল ফাংশন ভাগ করে: খোলার অ্যানিমেশন, X, বাইরে ক্লিক, Escape, স্ট্যাকড মডাল, ফোকাস ফেরত, স্ক্রল লক। টোস্ট ~৩.৪ সেকেন্ড পর নিজে মিলিয়ে যায়।
 
+### ৪.১৪ অ্যাডমিন ড্যাশবোর্ড (`/admin.html`)
+সাইটের মালিকের জন্য আলাদা পেজ: চারটি সারাংশ কার্ড, প্রতিটি শিক্ষার্থীর অ্যাক্টিভিটি সংখ্যাসহ পুরো টেবিল, আর কানেকশন রিকোয়েস্টের ইনবক্স — সাথে **Accept** / **Decline** বাটন। পেজটি কেবল তখনই লোড হয় যখন `profiles.is_admin` সত্য; বাকি সবার জন্য প্রতিটি `/api/admin/*` রুট **403** ফেরত দেয়।
+
+```js
+// admin.js প্রথমে জিজ্ঞেস করে টোকেনটি কার, তারপর ঠিক করে কী দেখাবে
+api('/api/auth/me').then(function (user) {
+  if (user.isAdmin) showDashboard(user);   // ৪টি কার্ড + ৩টি টেবিল
+  else { clearToken(); showGate('This account is not an administrator.'); }
+});
+```
+
+ব্রাউজারের এই চেক শুধু চোখের আরামের জন্য। আসল সুরক্ষা Python-এর `require_admin()` — প্রতিটি রিকোয়েস্টে ডেটাবেস থেকে `is_admin` পড়ে। তাই হাতে `/admin.html` টাইপ করলেও শুধু লগইন গেট দেখায়, আর কিছু না। Accept করলে শেষ পর্যন্ত `connection_requests.status` কলামে লেখা হয় — যে কলামে শিক্ষার্থীদের পেজ কখনো হাত দেয় না।
+
 ## ৫. ডেটার "দুইটি দরজা" (এখন ব্যাকএন্ডে যুক্ত)
 
 সব কনটেন্ট আসে `js/data.js` *অথবা* API থেকে, আর সব ইউজার-স্টেট যায় `TB.state` (`js/main.js`) দিয়ে। UI মডিউল সরাসরি storage ধরে না। এই ডিজাইনের কারণেই UI নতুন করে না লিখে ব্যাকএন্ড যোগ করা গেছে: `js/api.js` শুধু ডেটার উৎস বদলায় আর `TB.state.set`-কে sync call দিয়ে মুড়ে দেয়।
@@ -498,7 +539,7 @@ cd thesisbridge-bd
 python -m http.server 8417 --directory public
 ```
 
-ব্রাউজারে খুলুন <http://127.0.0.1:8417/index.html>। API ডকুমেন্টেশন: <http://127.0.0.1:8000/docs>। API বন্ধ থাকলেও সাইট `js/data.js` ফলব্যাক দিয়ে দেখা যাবে, তবে লগইন ও সেভ কাজ করবে না।
+ব্রাউজারে খুলুন <http://127.0.0.1:8417/index.html>। API ডকুমেন্টেশন: <http://127.0.0.1:8000/docs>। API বন্ধ থাকলেও সাইট `js/data.js` ফলব্যাক দিয়ে দেখা যাবে, তবে লগইন ও সেভ কাজ করবে না। অ্যাডমিন ড্যাশবোর্ড <http://127.0.0.1:8417/admin.html>-এ; এর অ্যাকাউন্ট একবার `python scripts/create_admin.py` দিয়ে বানাতে হবে (`SETUP.md` দেখুন)।
 
 ## ৭. যেসব টেস্ট করা হয়েছে
 
@@ -511,11 +552,12 @@ python -m http.server 8417 --directory public
 - আসল Supabase প্রজেক্টের বিরুদ্ধে ৫৭টি স্বয়ংক্রিয় API টেস্ট — সবগুলো পাস: কনটেন্টের সংখ্যা, সাইন-আপ, টোকেন-প্রোটেক্টেড রুট (টোকেন ছাড়া ৪০১), পাঁচটি সেভ-লিস্ট, প্রোফাইলের আংশিক আপডেট, কানেকশন রিকোয়েস্ট (মেম্বার ও গেস্ট), লগইন রাউন্ড ট্রিপ, ভ্যালিডেশন (৪২২) এবং ডেটাবেসের আসল রো।
 - আসল ডেটাবেস নিয়ে সম্পূর্ণ ব্রাউজার টেস্ট: সাইন-আপ → বুকমার্ক → রোডম্যাপ → চেকলিস্ট → লোকাল কপি মুছে দিয়ে রিলোড → PostgreSQL থেকে ডেটা ফিরে আসা → লগআউট → লগইন → কানেকশন রিকোয়েস্ট।
 - **পাওয়া ও ঠিক করা আসল বাগ:** FAQ-এর ফিল্ড-নামের অমিল (PostgreSQL-এ `question`/`answer`, ব্রাউজারে `q`/`a`) এবং ডেটাবেসের এরর অ-readable ৫০০ হিসেবে বেরিয়ে যাওয়া — এখন ৫০৩ + করণীয় লেখা থাকে।
+- **অ্যাডমিন ড্যাশবোর্ড:** লোকাল ৪৭টি ও লাইভ ৩২টি টেস্ট — টোকেন ছাড়া ৪০১, সাধারণ শিক্ষার্থীর জন্য চারটি অ্যাডমিন রুটেই ৪০৩, overview/শিক্ষার্থী/ইনবক্সের ডেটার গঠন, স্ট্যাটাস ফিল্টার, `pending → accepted`, ভুল বানানের স্ট্যাটাসে ৪২২, অজানা আইডিতে ৪০৪ — শেষে সব টেস্ট-রো ও টেস্ট-অ্যাকাউন্ট মুছে ডেটাবেস শূন্য করে যাচাই।
 
 ## ৮. সীমাবদ্ধতা ও ভবিষ্যৎ পরিকল্পনা
 
-অ্যাক্সেস টোকেন ১ ঘণ্টা টেকে (রিফ্রেশ ফ্লো নেই) · কানেকশন রিকোয়েস্ট সেভ হয় কিন্তু ইমেইল যায় না (SMTP নেই) · ম্যাচিং স্কোর ব্রাউজারে চলে · এখনো অ্যাডমিন প্যানেল নেই · Supabase ফ্রি প্ল্যান নিষ্ক্রিয় প্রজেক্ট পজ করে।
-**পরবর্তী ধাপ:** কনটেন্ট ও রিকোয়েস্টের জন্য অ্যাডমিন ড্যাশবোর্ড, ইমেইল নোটিফিকেশন, রিফ্রেশ-টোকেন হ্যান্ডলিং।
+অ্যাক্সেস টোকেন ১ ঘণ্টা টেকে (রিফ্রেশ ফ্লো নেই) · কানেকশন রিকোয়েস্ট সেভ হয় কিন্তু ইমেইল যায় না (SMTP নেই) · ম্যাচিং স্কোর ব্রাউজারে চলে · অ্যাডমিন ড্যাশবোর্ড ডেটা পড়তে ও রিকোয়েস্টের স্ট্যাটাস বদলাতে পারে, কিন্তু এখনো কনটেন্ট এডিট করতে পারে না · Supabase ফ্রি প্ল্যান নিষ্ক্রিয় প্রজেক্ট পজ করে।
+**পরবর্তী ধাপ:** অ্যাডমিন ড্যাশবোর্ড থেকেই কনটেন্ট এডিটিং, রিকোয়েস্ট এলে ইমেইল, আর রিফ্রেশ-টোকেন হ্যান্ডলিং।
 
 ---
 

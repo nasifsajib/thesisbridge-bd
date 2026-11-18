@@ -39,8 +39,9 @@ Add a real backend and database to the existing static ThesisBridge BD site.
 | 8 | Create the Supabase project and run the SQL | ✅ Done |
 | 9 | Run the seeder against the real project | ✅ Done — all 9 counts OK |
 | 10 | End-to-end test: signup → bookmark → reload → logout → login | ✅ Done — 57 API checks + browser run |
-| 11 | Deploy to Vercel and test the live URL | ⏳ Next |
+| 11 | Deploy to Vercel and test the live URL | ✅ Done — 32/32 live checks |
 | 12 | Update the frontend copy + README report for the new architecture | ✅ Done |
+| 13 | Administrator dashboard (`/admin.html` + `/api/admin/*`) | ✅ Done — 47 local + 32 live checks |
 
 Legend: ✅ done · 🟡 in progress · ⏳ pending · ❌ blocked.
 
@@ -126,6 +127,9 @@ FastAPI dependencies (functions FastAPI runs before a route):
   `{id, email, token}` after `auth.get_user(token)` verifies it with Supabase.
 - `get_optional_user()` → returns `None` instead of raising; used by the public
   connection-request endpoint so guests and members can both send requests.
+- `require_admin()` → calls `get_current_user()`, then reads `is_admin` from
+  `profiles`; 403 for a valid student, and a database "undefined column" error
+  (`42703`) is translated into a 503 that says to run `sql/002_admin.sql`.
 
 `ConfigurationError` is re-raised (not converted to 401) so a missing `.env`
 is reported as a setup problem.
@@ -197,11 +201,25 @@ instead of eight, exactly preserving the old rendering logic.
 - `GET /me/connection-requests` → my requests, newest first.
 - `DELETE /me/connection-requests/{supervisor_id}` → withdraw one.
 
+### `app/routers/admin.py`
+Four routes, every one of them behind `require_admin()`:
+- `GET /admin/overview` → student count (admins excluded), request counts by
+  status, total bookmarks, and the five most-bookmarked ideas.
+- `GET /admin/students` → every non-admin profile plus seven activity counts
+  (bookmarks, saved supervisors, roadmap steps, guides read, checklist items,
+  requests) and `joinedAt`.
+- `GET /admin/connection-requests?status=` → the inbox, optionally filtered by
+  `pending` / `accepted` / `declined` (an invalid word is a 422 from FastAPI),
+  with the supervisor's name resolved.
+- `PUT /admin/connection-requests/{id}/status` → set the status; a 404 when the
+  id does not exist.
+
 ### `app/main.py`
 - Creates `app = FastAPI(...)` (the name Vercel looks for).
 - Adds `CORSMiddleware` (`allow_credentials=False` because we use Bearer
   tokens, not cookies).
-- Registers four routers under `/api`, `/api/auth`, `/api/me`, `/api`.
+- Registers five routers under `/api`, `/api/auth`, `/api/me`, `/api`, and
+  `/api/admin` (the admin prefix is separate so the 403 rule is applied once).
 - `GET /api/health` → always 200; reports `databaseConfigured` and
   `missingSettings`, so it is the first URL to open when something is wrong.
 - Exception handler for `ConfigurationError` → 503 + readable detail.
@@ -218,6 +236,27 @@ instead of eight, exactly preserving the old rendering logic.
 - Categories are inserted **before** ideas because `research_ideas.category`
   is a foreign key to `categories(name)`.
 - Finishes with a row-count verification against the expected numbers.
+
+### `scripts/create_admin.py`
+- `--email` / `--password` / `--name`; no password anywhere in the repository.
+- Checks `profiles.is_admin` exists first and stops with instructions if
+  `sql/002_admin.sql` has not been run.
+- Creates the Supabase Auth user (`email_confirm=True`) if new, otherwise resets
+  the password — so re-running it is how the password is changed later.
+- Upserts `profiles` with `is_admin = true`, reads the row back, and refuses to
+  report success if the flag is still false.
+- Uses the **service-role** key because creating auth users and granting admin
+  rights are operations the browser must never be able to do.
+
+### `public/admin.html` + `public/js/admin.js`
+- A standalone page: it loads no `main.js`, `api.js` or `data.js`, so a bug in
+  the dashboard cannot break the public site (and vice versa).
+- Login gate → `GET /api/auth/me` → if `isAdmin` draw four stat cards, the
+  top-ideas table, the student table and the request inbox; otherwise clear the
+  token and show "This account is not an administrator."
+- Accept / Decline calls the status endpoint and refreshes the cards.
+- All values are HTML-escaped before insertion, and the page shares the same
+  `tb_token` key as the site, so signing in on either one signs you in on both.
 
 ---
 
@@ -243,7 +282,7 @@ instead of eight, exactly preserving the old rendering logic.
 ### User tables
 | Table | Key | Cascade |
 | --- | --- | --- |
-| `profiles` | PK/FK `id` → `auth.users(id)` | deleting an auth user deletes the profile |
+| `profiles` | PK/FK `id` → `auth.users(id)` | deleting an auth user deletes the profile; `is_admin boolean not null default false` added by `sql/002_admin.sql` |
 | `idea_bookmarks` | PK `(user_id, idea_id)` | cascade from both sides |
 | `saved_supervisors` | PK `(user_id, supervisor_id)` | cascade |
 | `roadmap_progress` | PK `(user_id, step_id)` | cascade |
@@ -263,7 +302,9 @@ instead of eight, exactly preserving the old rendering logic.
   Supabase directly with the anon key.
 
 Indexes: `research_ideas(category)`, `(difficulty)`, `(type)`,
-`supervisors(university)`, `connection_requests(user_id)`.
+`supervisors(university)`, `connection_requests(user_id)`, and a **partial**
+index `profiles(id) where is_admin` (the dashboard asks "who is an admin?"
+often, the answer is almost always "nobody").
 
 Trigger: `profiles_touch_updated_at` → `public.touch_updated_at()` sets
 `updated_at = now()` on every profile update.
@@ -357,7 +398,7 @@ Pydantic 2.14.3, supabase-py 2.34.1.
 | JS syntax (7 files) | `node --check public/js/*.js` | PASS |
 | Dependencies install on Python 3.14 | `pip install -r requirements.txt` | PASS |
 | App import | `from app.main import app` | PASS |
-| Route registration | `app.openapi()["paths"]` | 26 API paths |
+| Route registration | `app.openapi()["paths"]` | 30 API paths |
 | Health, no env | `GET /api/health` | 200, `databaseConfigured: false` |
 | Content, no env | `GET /api/content` | 503 with readable missing-variable message |
 | Protected route, no token | `GET /api/me/state` | 401 "Please log in to continue." |
@@ -385,8 +426,16 @@ Pydantic 2.14.3, supabase-py 2.34.1.
 | **Live: guest request** | `POST /api/connection-requests` without a token | 201, stored with `user_id = NULL` |
 | **Live: test data cleanup** | deleted `e2e-*` / `browser-*` accounts | all 7 user tables back to 0 rows; content tables untouched |
 | **Live Supabase test** | — | ✅ complete |
+| **Vercel deploy** | `git push` → automatic build | live at `https://thesisbridge-bd.vercel.app`; `/api/health` reports `databaseConfigured: true` |
+| **Live: endpoint count** | `GET /openapi.json` | 30 paths, all admin routes documented |
+| **Live: deployed suite** | temporary probe, 32 assertions | **32 passed, 0 failed**, then every test row deleted |
+| **Admin: local suite** | temporary probe against uvicorn, 47 assertions | **47 passed, 0 failed** |
+| **Admin: role enforced** | student token on all four admin routes | 401 without a token, 403 for a student |
+| **Admin: browser** | Chromium, `/admin.html` | gate shown first; admin sees cards/tables; Accept writes `accepted` and the cards update; a student login shows "This account is not an administrator." |
+| **Admin: navbar link** | admin signed in on `index.html` | shield icon + "Admin dashboard" appears only for `isAdmin` |
+| **Admin: live suite** | same probe against Vercel, 32 assertions | **32 passed, 0 failed**, database verified clean |
 
-The 26 endpoints:
+The 30 endpoints:
 
 ```
 GET    /api/health
@@ -415,6 +464,10 @@ PUT    /api/me/profile
 POST   /api/connection-requests
 GET    /api/me/connection-requests
 DELETE /api/me/connection-requests/{supervisor_id}
+GET    /api/admin/overview
+GET    /api/admin/students
+GET    /api/admin/connection-requests
+PUT    /api/admin/connection-requests/{request_id}/status
 ```
 
 ---
@@ -435,6 +488,9 @@ DELETE /api/me/connection-requests/{supervisor_id}
 | Site moved to `public/` | rewrites in `vercel.json` | Vercel's documented FastAPI layout; no path tricks |
 | Python 3.14 (`.python-version`) | 3.12 | Matches the local interpreter; Vercel supports 3.14 |
 | `seed/content.json` from `js/data.js` | retype data | Exact same 20/12/20/7/8/8/8/58 records, no typos |
+| `is_admin` as a database column | email list in config, or a claim inside the JWT | Changing an admin is one SQL update, no redeploy; the token cannot be forged to gain the role |
+| `require_admin()` as the only gate | extra RLS policies for admin reads | The API already uses the service role, so a second rule set would be a second place to get wrong |
+| Standalone `admin.html` / `admin.js` | a section inside `index.html` | A dashboard bug cannot break the public site; no extra code is downloaded by students |
 
 ---
 
@@ -443,34 +499,35 @@ DELETE /api/me/connection-requests/{supervisor_id}
 1. Access token lasts 1 hour; no refresh-token rotation in the frontend.
 2. Connection requests are stored, not emailed (no SMTP).
 3. Matching quiz and its score still run in the browser.
-4. No admin panel; content changes = SQL or re-run the seeder.
+4. The dashboard can read data and change a request's status, but it cannot
+   create or edit content yet; that still means SQL or the seeder.
 5. Guests' connection requests have `user_id = NULL`; they cannot see them
    after clearing the browser.
 6. Supabase free plan pauses after ~7 days of inactivity.
 7. `research_ideas.category` is a FK to `categories(name)`: adding a category
    later needs a row in `categories` first.
+8. The admin dashboard loads every student and every request in one go; fine at
+   demo size, but a real deployment would need pagination.
 
 ---
 
 ## 12. Next steps (in order)
 
-Done already: ✅ credentials + `.env` · ✅ schema · ✅ seeding · ✅ local
-end-to-end test (57 API checks + full browser run).
+Done already: ✅ credentials + `.env` · ✅ schema (001 + 002) · ✅ seeding ·
+✅ local end-to-end test (57 API checks + full browser run) · ✅ deploy to Vercel
+· ✅ live test (32 checks) · ✅ administrator dashboard (47 local + 32 live
+checks) · ✅ README / SETUP / WORK_HISTORY updated.
 
 Still to do:
 
-1. **Push to GitHub** (the folder is not a git repository yet):
-   `git init`, `git add .`, commit, create the repo, push.
-   `.env` is gitignored, so the keys do **not** go to GitHub.
-2. **Import in Vercel** → framework preset *Other* → no build command.
-3. **Add the environment variables** in Vercel (Production + Preview):
-   `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
-   optionally `CORS_ORIGINS`.
-4. **Deploy**, then open `https://<project>.vercel.app/api/health` and check
-   `databaseConfigured: true`.
-5. **Repeat the browser test on the live URL**: signup → bookmark → reload →
-   logout → login → connection request.
-6. Add the live URL to `README.md` and append the final session here.
+1. **Content editing in the dashboard** — an admin-only `PUT` for ideas,
+   supervisors and guides, with a form rather than raw SQL.
+2. **Email when a request arrives** — Supabase Edge Function or a small SMTP
+   call, so the owner does not have to open the dashboard to notice.
+3. **Refresh tokens** — stop asking users to log in again every hour.
+4. **Pagination** for `/api/admin/students` before the table gets large.
+5. Optional: a second admin, created with
+   `python scripts/create_admin.py --email other@example.com --password "..."`.
 
 ---
 
@@ -800,4 +857,215 @@ first deploy, not later.
 - Import the repo on Vercel with Framework Preset **FastAPI**, add the three env
   vars, deploy, then run the four checks and the browser flow on the live URL.
 
+## Session 6 - first real deploy, and the live verification
+
+**Goal:** stop reasoning about Vercel from documentation and actually put the
+project online, then repeat the local checks against the live URL.
+
+**1. Repository**
+
+- `git init` in `thesisbridge-bd`, `.env` already ignored, first commit
+  `f787b4f` ("ThesisBridge BD: FastAPI + Supabase backend with bilingual docs").
+- Pushed to `github.com/nasifsajib/thesisbridge-bd` (`main`).
+- `gh` CLI is not installed on this machine, so the remote was added with plain
+  `git remote add origin`; pushes print a PowerShell `NativeCommandError` but
+  succeed (that is a known quirk of git writing progress to stderr, not a
+  failure).
+
+**2. Vercel**
+
+- Imported the repository, framework preset **FastAPI** (selected explicitly so
+  the dropdown cannot pick "Other" and turn the API into a static site).
+- Added `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` for
+  Production and Preview; `CORS_ORIGINS` left as `*` because the API uses a
+  Bearer token, not cookies.
+- Result: <https://thesisbridge-bd.vercel.app> — the HTML pages, the Python API
+  and `/docs` all answer on the same domain.
+
+**3. What was checked on the live site**
+
+- `/api/health` → `"databaseConfigured": true`, `"missingSettings": []`.
+- `/api/content` → all 15 content keys, counts identical to the seeder
+  (20 ideas, 12 supervisors, 20 resources, 7 guides, 8 steps, 8 FAQs,
+  8 checklist items, 9 categories, 58 filter options).
+- `/docs` → the Swagger page loads and lists **26** endpoints at that time.
+- Live end-to-end run: **32/32** checks, including sign-up, every saved list,
+  the round trip after deleting localStorage, logout/login, a member request
+  and a guest request. Afterwards every test account and test row was deleted
+  and the tables were verified back to zero.
+- Production database confirmed to hold only the owner's own profile and no
+  leftover test data.
+
+**Honest note for the viva:** the deploy proved three things that local testing
+cannot — that the entrypoint is detected, that the environment variables reach
+the function, and that `public/` is served as static files at the same time.
+
+## Session 7 - administrator dashboard
+
+**Goal:** the owner asked to see student details and the connection requests
+without opening the Supabase dashboard.
+
+**1. The permission model came first**
+
+Before any UI, the question was "where does the answer 'this person is an
+admin' live?". Options were an email allow-list in `.env`, a custom claim in
+the JWT, or a column in the database. The column won: changing an admin is one
+`update` statement and needs no redeploy, and a token cannot be edited to gain
+the role.
+
+- `sql/002_admin.sql` → `alter table profiles add column if not exists
+  is_admin boolean not null default false`, plus a partial index
+  `where is_admin`. The user ran it in the SQL Editor; Supabase answered
+  `Success. No rows returned`.
+- `app/dependencies.py` → `require_admin()`: runs `get_current_user()` first
+  (so no token is a 401), then reads the flag (so a student is a 403). A
+  PostgREST `42703` ("column does not exist") is translated into a 503 whose
+  message says to run `sql/002_admin.sql` — the same courtesy the rest of the
+  backend already gives for missing tables.
+
+**2. The account, without a password in the code**
+
+`scripts/create_admin.py --password "..."`:
+
+- refuses to run if the column is missing,
+- creates the Supabase Auth user with `email_confirm=True` (no SMTP here) or
+  resets the password if the address already exists,
+- upserts `profiles` with `is_admin = true` and reads the row back before
+  claiming success.
+
+The password therefore exists only as a bcrypt hash inside `auth.users`. It is
+not in the repository, not in `.env`, and not in this document. Re-running the
+script is also the "change my password" procedure.
+
+**3. The four endpoints** (`app/routers/admin.py`, prefix `/api/admin`)
+
+| Route | Returns |
+| --- | --- |
+| `GET /overview` | students (admins excluded), request counts by status, total bookmarks, five most-bookmarked ideas |
+| `GET /students` | every student + six activity counts + `joinedAt` |
+| `GET /connection-requests?status=` | the inbox with supervisor names, optionally filtered |
+| `PUT /connection-requests/{id}/status` | sets `pending` / `accepted` / `declined` |
+
+`status` is typed `Literal["pending", "accepted", "declined"]`, so a typo is a
+422 from FastAPI rather than a bad row. An unknown id is a 404.
+
+**4. The page** (`public/admin.html` + `public/js/admin.js`)
+
+- Standalone on purpose: no `main.js`, no `api.js`, no `data.js`. A dashboard
+  bug cannot break the six student pages, and students never download it.
+- Sign-in gate → `GET /api/auth/me` → `isAdmin` decides between the dashboard
+  and "This account is not an administrator." (token cleared).
+- Four stat cards, top ideas, the student table, the inbox with **Accept** /
+  **Decline** and filter chips. Values are escaped before insertion.
+- Same `tb_token` key as the site, so one login covers both pages; the student
+  navbar shows a shield link to `admin.html` only when `user.isAdmin` is true.
+
+**5. Verification**
+
+- **47/47 local checks**: the public site unaffected, 401 without a token, 403
+  for a real student on all four routes, overview/student/inbox shapes, filter
+  behaviour, `pending → accepted`, a misspelled status → 422, unknown id → 404,
+  then cleanup.
+- **Browser, local:** gate first, dashboard after login, Accept sent a real
+  `PUT` (network log: 200) and the cards changed `1 pending` → `0 pending` /
+  `accepted 0` → `1`; a student login produced the refusal message and left no
+  token; the admin navbar link appeared only for the admin.
+- **32/32 live checks** on Vercel after the deploy (commit `594320d`), with the
+  same cleanup and a final "no `e2e.*` rows or users left" assertion.
+- One UI label was changed from "Sups" to "Saved" with a tooltip, because the
+  abbreviation was not explainable to a reader.
+
+**6. Decisions worth defending**
+
+- No new RLS policies for admin reads. The API already connects with the
+  service-role key, which bypasses RLS; adding admin policies would create a
+  second, divergent rule set. `require_admin()` is the single gate, and it is
+  checked on every request.
+- `ProfileUpdate` has no `is_admin` field, so `model_dump(exclude_unset=True)`
+  means a student cannot promote themselves through `PUT /api/me/profile`.
+- Quiz match scores are never stored, so the dashboard shows *connection
+  requests*; calling them "matches" would be inventing data.
+
+**Next session**
+
+- Documentation catch-up (README Bangla mirror, SETUP, this file, the
+  presentation prompt and the generated study document all still said
+  "26 endpoints" and "no admin panel").
+
 <!-- Append new sessions below this line. -->
+
+## Session 8 - document review, and a defence guide
+
+**1. What was reviewed (no deliverable edited)**
+
+- `02_ThesisBridge-BD-Lab-Report.docx` - 15 pages, 3,170 words, 10 tables,
+  8 images. Exported through Word COM to PDF and rendered page by page, and
+  the text and tables extracted with python-docx.
+- `ThesisBridge-BD-Final.pptx` - 15 slides, 16:9. Exported through PowerPoint
+  COM to PDF and rendered slide by slide; notes included in the extraction.
+
+**2. Report findings**
+
+- The Contents page advertises "8. Authentication and Security", but the body's
+  section 8 is "Database Design" and no authentication section exists.
+- Table numbering jumps from 7 to 9 - Table 8 is missing.
+- Table 2 lists 7 content types totalling 83 rows while the text claims 150
+  seeded rows; the missing groups are categories (9) and filter options (58).
+- Figure 5 is captioned "Idea detail modal" but shows the Idea Explorer page;
+  Figure 7 is captioned "Research roadmap" but shows the home hero.
+- Figures 3 and 4 carry a large empty black band; Figure 4 is cropped before
+  the matching quiz its caption promises; Figure 1's labels are too small and
+  overlap the boxes; the `CamelModel` code block splits across pages 11-12.
+- Counts are stale after the admin work: 26 endpoints, 11 Python files,
+  4 routers, 27 models, and the scope still says "one real user account".
+
+**3. Deck findings**
+
+- 26 endpoints on slides 4, 5 and 9; "4 routers" on slide 5; "Eleven Python
+  files" and 27 models on slide 8; "57 checks" on slide 14.
+- No admin dashboard slide, no security/RLS slide, no limitations slide.
+- Slide 14's speaker note says "improve first: an admin page", which now
+  contradicts the project.
+- Slide 3's centre and right screenshots carry the same black band; slide 1
+  reads "Dept of CSE,NDUB" without a space.
+
+**4. A finding about the screenshots themselves**
+
+- `public/assets/shots/13-idea-modal.png` shows the Idea Explorer page, not a
+  modal. `public/assets/shots/05-roadmap.png` shows the dark hero, not the
+  roadmap. The report used the file names that promised the right picture and
+  still got the wrong pixels, so both figures have to be re-captured from the
+  live site rather than re-inserted.
+
+**5. New deliverable: `DEFENCE-GUIDE.html`**
+
+- Standalone, no external assets, opens by double-click like the study
+  document. Ten sections: numbers to quote, slide-to-report map, all 15 slides
+  (what is on it / what the visual says / say this / if asked / fix), all 7
+  report figures and the 6 deck diagrams, all 9 report tables, about 50 terms
+  in plain words, the 13 backend files, the 6 database files, all 16 tables,
+  all 30 endpoints, and a tickable fix list.
+- Includes a search box, a print stylesheet and checkboxes that remember their
+  state in localStorage, so the fix list can be worked through in the browser.
+- Counts were read from the code, not from the documents: 30 endpoints
+  (29 routes + health), 5 routers, 13 Python files (10 modules + 3 scripts,
+  excluding the two `__init__.py` markers), 32 models on top of `CamelModel`,
+  16 tables, and 150 = 83 content + 9 categories + 58 filter options.
+- Mobile layout bug found and fixed while checking the rendering: the
+  single-column grid used `1fr`, whose automatic minimum let wide tables push
+  the column past the viewport. Changed to `minmax(0,1fr)` with `min-width:0`
+  on the grid children.
+
+**6. Decisions**
+
+- The guide follows the code wherever the code and the documents disagree, and
+  says so on the page rather than quietly picking a number.
+- The review stayed read-only, as asked: no byte of the .docx or the .pptx was
+  changed in this session.
+
+**Next session**
+
+- Apply the fix list to the report and the deck when asked, then re-export and
+  re-check counts, captions and page breaks.
+- `scripts/build_prep_doc.py` still hardcodes "26 endpoints" and has no admin
+  routes, so `iit-preparation.html` is one generation behind.
